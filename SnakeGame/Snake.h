@@ -1,12 +1,15 @@
 #include <utility> // std::pair
 
-#include "Direction.h" // Direction Enum
+#include "DataTypes.h"
 #include "SnakeNode.h"
 
 #pragma once
 class Snake
 {
 public:
+	Snake();
+	// If no start cords are given starts at (0, 0)
+
 	Snake(cords start);
 	// Constructor creates snake with one node at given cordinate
 
@@ -25,6 +28,15 @@ public:
 
 	void changeDirection(Direction dir);
 	// Changes snake Direction
+
+	cords headLocation();
+	// Returns current head location
+
+	std::vector<cords> bodyLocation();
+	// Returns list of body cords
+
+	int getSize();
+	// Returns current size of snake
 
 private:
 	SnakeNode* head;

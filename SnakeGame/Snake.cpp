@@ -1,6 +1,14 @@
 #include "Snake.h"
-#include "Direction.h"
+#include "DataTypes.h"
 #include "SnakeNode.h"
+
+Snake::Snake() {
+	head = new SnakeNode(std::make_pair(0, 0), nullptr, nullptr);
+	tail = head;
+	direction = up;
+	size = 1;
+	maxSize = size;
+}
 
 Snake::Snake(cords start) {
 	head = new SnakeNode(start, nullptr, nullptr);
@@ -79,3 +87,20 @@ void Snake::changeDirection(Direction dir) {
 	direction = dir;
 }
 
+cords Snake::headLocation() {
+	return head->getCords();
+}
+
+std::vector<cords> Snake::bodyLocation() {
+	SnakeNode* cur = head->getBack();
+	std::vector<cords> body;
+	for (int i = 0; i < size; ++i) {
+		body.push_back(cur->getCords());
+		cur = cur->getBack();
+	}
+	return body;
+}
+
+int Snake::getSize() {
+	return size;
+}

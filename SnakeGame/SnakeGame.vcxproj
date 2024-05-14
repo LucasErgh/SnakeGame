@@ -129,16 +129,22 @@
   <ItemGroup>
     <ClCompile Include="Apple.cpp" />
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="CellList.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeGame.cpp" />
     <ClCompile Include="SnakeNode.cpp" />
+    <ClCompile Include="TestView.cpp" />
+    <ClCompile Include="View.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Apple.h" />
     <ClInclude Include="Board.h" />
-    <ClInclude Include="Direction.h" />
+    <ClInclude Include="CellList.h" />
+    <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeNode.h" />
+    <ClInclude Include="TestView.h" />
+    <ClInclude Include="View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

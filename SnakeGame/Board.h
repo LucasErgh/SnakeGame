@@ -1,15 +1,25 @@
-#include "Direction.h"
+#pragma once
+
+#include <vector>
 #include "Snake.h"
 #include "Apple.h"
+#include "CellList.h"
 
-#pragma once
 class Board
 {
 public:
+	Board(int width = 20, int height = 20);
 
+	bool doTurn();
+
+	bool doTurn(Direction dir);
+
+	CellList updateBoard();
 
 private:
 	int width, height;
-
+	Snake snake;
+	Apple apple;
+	const int growthRate = 3;
+	CellList board;
 };
-

@@ -1,10 +1,16 @@
-#include "Direction.h"
+#include "DataTypes.h"
 #include "Snake.h"
 
 #pragma once
 class Apple {
 public:
-	Apple(int width, int height, Snake snake);
+	Apple();
+
+	cords getCords();
+
+	cords moveApple(int width, int height);
+
+private:
 	cords cordinates;
 };
 
