@@ -16,6 +16,8 @@ public:
 
 	CellList updateBoard();
 
+	void endGame();
+
 private:
 	int width, height;
 	Snake snake;

@@ -12,6 +12,14 @@ public:
 
 	std::vector<cell> getList();
 
+	int x(int index);
+
+	int y(int index);
+
+	CellType type(int index);
+
+	int size();
+
 private:
 	std::vector<cell> list;
 };

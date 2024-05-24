@@ -1,4 +1,4 @@
-#include "Direction.h"
+#include "DataTypes.h"
 
 #pragma once
 class SnakeNode {

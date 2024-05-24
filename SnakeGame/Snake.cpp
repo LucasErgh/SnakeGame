@@ -35,7 +35,7 @@ cords Snake::move() {
 		--newLocation.first;
 		break;
 	case right:
-		++newLocation.second;
+		++newLocation.first;
 		break;
 	default:
 		break;
@@ -52,9 +52,15 @@ cords Snake::move() {
 	}
 	else { // if the snake doesn't need to grow make the tail the node infront of tail and delete the old tail
 		SnakeNode* oldTail = tail;
-		tail = oldTail->getFront();
+		if (oldTail->getFront() == nullptr)
+			tail = head;
+		else {
+			tail = oldTail->getFront();
+			tail->newBack(nullptr);
+		}
 		delete oldTail;
 	}
+	return newHead->getCords();
 }
 
 bool Snake::isSnake(cords cords) {
@@ -92,15 +98,40 @@ cords Snake::headLocation() {
 }
 
 std::vector<cords> Snake::bodyLocation() {
-	SnakeNode* cur = head->getBack();
+	SnakeNode* cur = head;
 	std::vector<cords> body;
-	for (int i = 0; i < size; ++i) {
-		body.push_back(cur->getCords());
+	for (int i = 1; i < size; ++i) {
 		cur = cur->getBack();
+		body.push_back(cur->getCords());
 	}
 	return body;
 }
 
 int Snake::getSize() {
 	return size;
+}
+
+void Snake::deleteNodes() {
+	SnakeNode* cur = tail;
+	while (cur->getFront() != nullptr) {
+		cur = cur->getFront();
+		delete cur->getBack();
+	}
+	delete cur;
+}
+
+bool Snake::snakeCollision() {
+	std::vector<cords> body = bodyLocation();
+	for (auto cur : body) {
+		if (head->getCords() == cur)
+			return true;
+	}
+	return false;
+}
+
+bool Snake::outOfBounds(int width, int height) {
+	cords headCords = headLocation();
+	if (headCords.first < 0 || headCords.second < 0 || headCords.first >= width || headCords.second >= height)
+		return true;
+	return false;
 }

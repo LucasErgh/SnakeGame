@@ -1,42 +1,97 @@
 #include <iostream>
-#include "View.h"
+#include <thread>
+#include <future>
+#include <chrono>
+#include "TestView.h"
 #include "Board.h"
 
+// Test Mode in Command Line
 void TestMode();
+char getChar();
 
 int main()
 {
-    int mode;
-    std::cout << "Welcome to Snake!" << std::endl 
-        << "Select your mode: " << std::endl
-        << "1. Test Mode" << std::endl
-        << "2. Command Line Mode" << std::endl
-        << "3. Windows Mode" << std::endl
-        << "4. Computer Controlled" << std::endl;
-    do {
-        std::cin.clear();
-        std::cin.ignore(1000, '\n');
-        std::cin >> mode;
-    } while (std::cin.fail() || mode > 4 || mode < 1);
+    TestMode();
 
-    View view;
-    switch (mode)
-    {
-    case 1:
-        view = new TestView();
-        break;
-    case 2:
-        break;
-    case 3:
-        break;
-    case 4:
-        break;
-    default:
-        break;
-    }
+    
 
 }
 
+// This runs the game in the command line
 void TestMode() {
+    int width = 20, height = 20;
+    TestView view = TestView();
+    bool alive = true;
+    Board board(width, height);
+    char input;
+    std::future<char> direction;
+    
 
+
+    direction = std::async(getChar);
+    do {
+
+        
+        if (direction.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
+            alive = board.doTurn();
+        else {
+            switch (direction.get())
+            {
+            case'w':
+                alive = board.doTurn(up);
+                break;
+            case'a':
+                alive = board.doTurn(left);
+                break;
+            case's':
+                alive = board.doTurn(down);
+                break;
+            case'd':
+                alive = board.doTurn(right);
+                break;
+            default:
+                break;
+            }
+            direction = std::async(getChar);
+        }
+
+        if(alive)
+            view.update(width, height, board.updateBoard());
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    //    view.update(width, height, board.updateBoard());
+    //    std::cin >> input;
+
+    //    switch (input)
+    //    {
+    //    case'w':
+    //        alive = board.doTurn(up);
+    //        break;
+    //    case'a':
+    //        alive = board.doTurn(left);
+    //        break;
+    //    case's':
+    //        alive = board.doTurn(down);
+    //        break;
+    //    case'd':
+    //        alive = board.doTurn(right);
+    //        break;
+    //    default:
+    //        break;
+    //    }
+    } while (alive);
+    
+    std::cout << "You Died, hit any key then enter to continue" << std::endl;
+    direction.get();
+}
+
+// This is used for getting the new direction of the snake
+char getChar() {
+    char temp;
+    do {
+        temp = ' ';
+        std::cin >> temp;
+    } while (temp != 'a' && temp != 'w' && temp != 's' && temp != 'd');
+    return temp;
 }

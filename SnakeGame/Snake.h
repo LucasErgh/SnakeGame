@@ -38,6 +38,13 @@ public:
 	int getSize();
 	// Returns current size of snake
 
+	void deleteNodes();
+	// Deletes all nodes
+
+	bool snakeCollision();
+
+	bool outOfBounds(int width, int height);
+
 private:
 	SnakeNode* head;
 	SnakeNode* tail;
