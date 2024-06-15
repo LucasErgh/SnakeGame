@@ -26,10 +26,10 @@ cords Snake::move() {
 	switch (direction)
 	{
 	case up:
-		++newLocation.second;
+		--newLocation.second;
 		break;
 	case down:
-		--newLocation.second;
+		++newLocation.second;
 		break;
 	case left:
 		--newLocation.first;

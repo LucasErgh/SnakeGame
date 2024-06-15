@@ -2,107 +2,103 @@
 #define UNICODE
 #endif 
 
-#include <iostream>
-#include <thread>
-#include <future>
-#include <chrono>
-#include <Windows.h>
+#include <windows.h>
 
-#include "TestView.h"
+#include "SnakeWindow.h"
 #include "Board.h"
+
+// Window Procedure declaration
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+	int rows = 10, columns = 10;
+	Board board(columns, rows);
+	StateInfo info(rows, columns, 40, &board);
+
+	SnakeWindow win(&info);
+
+	if (!win.Create(L"Snake", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, 440, 460)) {
+		return 0;
+	}
+
+	ShowWindow(win.Window(), nCmdShow);
+
+	MSG msg = { };
+	while (GetMessage(&msg, NULL, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	/*// Register the window class
+	const wchar_t CLASS_NAME[] = L"Sample Window Class"; // Name the window class 
+
+	WNDCLASS wc = { };	// Define the structure
+
+	wc.lpfnWndProc = WindowProc;	// Set Window Procedure
+	wc.hInstance = hInstance;		// Sets handle to the application instance
+	wc.lpszClassName = CLASS_NAME;	// Identifies the window class
+
+	RegisterClass(&wc);	// This function registers the window class with the operating system
+
+	// Create Window Reference https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexa
+	HWND hwnd = CreateWindowEx(
+		0,								// Optional window styles
+		CLASS_NAME,						// Window class
+		L"Learn to Program Windows",	// Window text
+		WS_OVERLAPPEDWINDOW,			// Window style
+
+		// Size and position
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		
+		NULL,		// Parent window
+		NULL,		// Menu
+		hInstance,	// Instance handle
+		NULL		// Additional application data
+	);
+	
+	if (hwnd == NULL) {
+		return 0;
+	}
+
+	ShowWindow(hwnd, nCmdShow); 
+	// remember nCmdShow is a flag that indicates if the window is minimized, maximized or shown normally
+
+
+	MSG msg = { };
+
+	while (GetMessage(&msg, NULL, 0, 0) > 0) // GetMessage returns 0 if PostQuitMessage was called
+	{
+		TranslateMessage(&msg);	// Translates message to keypress
+		DispatchMessage(&msg);	// Calls corrosponding Window Procedure
+	}*/
+
 	return 0;
 }
 
-//// Test Mode in Command Line
-//void TestMode();
-//char getChar();
-//
-//int main()
-//{
-//    TestMode();
-//
-//    
-//
-//}
-//
-//// This runs the game in the command line
-//void TestMode() {
-//    int width = 20, height = 20;
-//    TestView view = TestView();
-//    bool alive = true;
-//    Board board(width, height);
-//    char input;
-//    std::future<char> direction;
-//    
-//
-//
-//    direction = std::async(getChar);
-//    do {
-//
-//        
-//        if (direction.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
-//            alive = board.doTurn();
-//        else {
-//            switch (direction.get())
-//            {
-//            case'w':
-//                alive = board.doTurn(up);
-//                break;
-//            case'a':
-//                alive = board.doTurn(left);
-//                break;
-//            case's':
-//                alive = board.doTurn(down);
-//                break;
-//            case'd':
-//                alive = board.doTurn(right);
-//                break;
-//            default:
-//                break;
-//            }
-//            direction = std::async(getChar);
-//        }
-//
-//        if(alive)
-//            view.update(width, height, board.updateBoard());
-//
-//        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//
-//    //    view.update(width, height, board.updateBoard());
-//    //    std::cin >> input;
-//
-//    //    switch (input)
-//    //    {
-//    //    case'w':
-//    //        alive = board.doTurn(up);
-//    //        break;
-//    //    case'a':
-//    //        alive = board.doTurn(left);
-//    //        break;
-//    //    case's':
-//    //        alive = board.doTurn(down);
-//    //        break;
-//    //    case'd':
-//    //        alive = board.doTurn(right);
-//    //        break;
-//    //    default:
-//    //        break;
-//    //    }
-//    } while (alive);
-//    
-//    std::cout << "You Died, hit any key then enter to continue" << std::endl;
-//    direction.get();
-//}
-//
-//// This is used for getting the new direction of the snake
-//char getChar() {
-//    char temp;
-//    do {
-//        temp = ' ';
-//        std::cin >> temp;
-//    } while (temp != 'a' && temp != 'w' && temp != 's' && temp != 'd');
-//    return temp;
-//}
+/*
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+
+		// All painting occurs here, between BeginPaint and EndPaint.
+
+		FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+
+		EndPaint(hwnd, &ps);
+	}
+	return 0;
+
+	}
+	return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+*/
