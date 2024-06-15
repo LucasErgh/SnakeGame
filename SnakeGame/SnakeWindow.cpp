@@ -44,34 +44,36 @@ void SnakeWindow::OnPaint() {
 
 		pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		// Draw Grid
-		int offset = 10;
-		int scale = 40;
-		int rows = 10;
+		if (info->board->isAlive()) {
+			// Draw Grid
+			int offset = 10;
+			int scale = 40;
+			int rows = 10;
 
-		pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Black));
-		for (int i = 0; i <= rows; i++) {
-			pRenderTarget->DrawLine(D2D1::Point2F(i * scale + offset, offset), D2D1::Point2F(i * scale + offset, rows * scale + offset), pBrush, 1);
-			pRenderTarget->DrawLine(D2D1::Point2F(offset, i * scale + offset), D2D1::Point2F(rows * scale + offset, i * scale + offset), pBrush, 1);
-		}
-
-		// Draw Snake Cells
-		
-		std::vector <cell> list = info->board->updateBoard().getList();
-		for (cell cur : list) {
-			switch (cur.second) {
-			case 0:
-				pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Red));
-				break;
-			case 1:
-				pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Green));
-				break;
-			case 2:
-				pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::GreenYellow));
-				break;
+			pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Black));
+			for (int i = 0; i <= rows; i++) {
+				pRenderTarget->DrawLine(D2D1::Point2F(i * scale + offset, offset), D2D1::Point2F(i * scale + offset, rows * scale + offset), pBrush, 1);
+				pRenderTarget->DrawLine(D2D1::Point2F(offset, i * scale + offset), D2D1::Point2F(rows * scale + offset, i * scale + offset), pBrush, 1);
 			}
-			ellipse = D2D1::Ellipse(D2D1::Point2F(offset + cur.first.first * scale - scale/2, offset + cur.first.second * scale - scale / 2), scale * .4, scale * .4);
-			pRenderTarget->FillEllipse(ellipse, pBrush);
+
+			// Draw Snake Cells
+
+			std::vector <cell> list = info->board->updateBoard().getList();
+			for (cell cur : list) {
+				switch (cur.second) {
+				case 0:
+					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Red));
+					break;
+				case 1:
+					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Green));
+					break;
+				case 2:
+					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::GreenYellow));
+					break;
+				}
+				ellipse = D2D1::Ellipse(D2D1::Point2F(offset + cur.first.first * scale - scale / 2, offset + cur.first.second * scale - scale / 2), scale * .4, scale * .4);
+				pRenderTarget->FillEllipse(ellipse, pBrush);
+			}
 		}
 
 		hr = pRenderTarget->EndDraw();
@@ -124,27 +126,37 @@ LRESULT SnakeWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		OnPaint();
 		return 0;
 
+	case WM_TIMER:
+		if (!info->board->doTurn()) {
+			// add end game
+			info->board->endGame();
+			KillTimer(m_hwnd, 1);
+			return 0;
+		}
+		OnPaint();
+		return 0;
+
 	case WM_KEYDOWN:
 		switch (wParam) {
 		
 		// W is pressed
 		case 0x57:
-			info->board->doTurn(up);
+			info->board->ChangeDirection(up);
 			break;
 
 		// A is pressed
 		case 0x41:
-			info->board->doTurn(left);
+			info->board->ChangeDirection(left);
 			break;
 
 		// S is pressed
 		case 0x53:
-			info->board->doTurn(down);
+			info->board->ChangeDirection(down);
 			break;
 
 		// D is pressed
 		case 0x44:
-			info->board->doTurn(right);
+			info->board->ChangeDirection(right);
 			break;
 		}
 

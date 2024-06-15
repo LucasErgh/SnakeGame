@@ -14,14 +14,19 @@ public:
 
 	bool doTurn(Direction dir);
 
+	void ChangeDirection(Direction dir);
+
 	CellList updateBoard();
 
 	void endGame();
+
+	bool isAlive();
 
 private:
 	int width, height;
 	Snake snake;
 	Apple apple;
-	const int growthRate = 3;
+	const int growthRate = 1;
 	CellList board;
+	bool gameOver;
 };

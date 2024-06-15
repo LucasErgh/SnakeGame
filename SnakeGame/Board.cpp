@@ -4,12 +4,18 @@
 
 Board::Board(int width, int height) : width(width), height(height) {
 	snake = Snake(std::make_pair(height/2, width/2));
+	gameOver = false;
 
 	// Make Apple
 	apple = Apple();
 	do {
 		apple.moveApple(width, height);
 	} while (snake.isSnake(apple.getCords()));
+}
+
+bool Board::isAlive() {
+	if (gameOver == true) return false;
+	else				  return true;
 }
 
 bool Board::doTurn() {
@@ -24,16 +30,24 @@ bool Board::doTurn() {
 	}
 
 	//Check for wall collision and snake collision
-	if (snake.snakeCollision())
+	if (snake.snakeCollision()) {
+		gameOver = true;
 		return false;
-	else if (snake.outOfBounds(width, height))
+	}
+	else if (snake.outOfBounds(width, height)) {
+		gameOver = true;
 		return false;
+	}
 	return true;
 }
 
 bool Board::doTurn(Direction dir) {
 	snake.changeDirection(dir);
 	return doTurn();
+}
+
+void Board::ChangeDirection(Direction dir) {
+	snake.changeDirection(dir);
 }
 
 CellList Board::updateBoard() {

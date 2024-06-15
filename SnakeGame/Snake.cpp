@@ -5,7 +5,9 @@
 Snake::Snake() {
 	head = new SnakeNode(std::make_pair(0, 0), nullptr, nullptr);
 	tail = head;
-	direction = up;
+	lastDirection = up;
+	queuedDirection1 = none;
+	queuedDirection2 = none;
 	size = 1;
 	maxSize = size;
 }
@@ -13,7 +15,9 @@ Snake::Snake() {
 Snake::Snake(cords start) {
 	head = new SnakeNode(start, nullptr, nullptr);
 	tail = head;
-	direction = up;
+	lastDirection = up;
+	queuedDirection1 = none;
+	queuedDirection2 = none;
 	size = 1;
 	maxSize = size;
 }
@@ -21,6 +25,16 @@ Snake::Snake(cords start) {
 cords Snake::move() {
 	// Create new had location based on current head location
 	cords newLocation(head->getCords());
+	Direction direction;
+
+	if (queuedDirection1 == none) 
+		direction = lastDirection;
+	else {
+		direction = queuedDirection1;
+		lastDirection = queuedDirection1;
+		queuedDirection1 = queuedDirection2;
+		queuedDirection2 = none;
+	}
 
 	// Move head location by one in current direction
 	switch (direction)
@@ -90,7 +104,31 @@ void Snake::grow(int growthAmount) {
 }
 
 void Snake::changeDirection(Direction dir) {
-	direction = dir;
+	Direction* last, *next;
+	if (queuedDirection1 == none) {
+		last = &lastDirection;
+		next = &queuedDirection1;
+	}
+	else {
+		last = &queuedDirection1;
+		next = &queuedDirection2;
+	}
+	*next = dir;
+	switch (*last)
+	{
+	case up:
+		if (*next == down) *next = none;
+		break;
+	case down:
+		if (*next == up) *next = none;
+		break;
+	case left:
+		if (*next == right) *next = none;
+		break;
+	case right:
+		if (*next == left) *next = none;
+		break;
+	}
 }
 
 cords Snake::headLocation() {
@@ -131,7 +169,7 @@ bool Snake::snakeCollision() {
 
 bool Snake::outOfBounds(int width, int height) {
 	cords headCords = headLocation();
-	if (headCords.first < 0 || headCords.second < 0 || headCords.first >= width || headCords.second >= height)
+	if (headCords.first <= 0 || headCords.second <= 0 || headCords.first > width || headCords.second > height)
 		return true;
 	return false;
 }

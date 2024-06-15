@@ -13,7 +13,8 @@ enum Direction {
 	up,
 	down,
 	left,
-	right
+	right,
+	none
 };
 
 typedef std::pair<int, int> cords;

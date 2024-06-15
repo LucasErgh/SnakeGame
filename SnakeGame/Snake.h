@@ -48,7 +48,9 @@ public:
 private:
 	SnakeNode* head;
 	SnakeNode* tail;
-	Direction direction;
+	Direction lastDirection;
+	Direction queuedDirection1;
+	Direction queuedDirection2;
 	int size;
 	int maxSize;
 };

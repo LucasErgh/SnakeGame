@@ -3,12 +3,12 @@
 #endif 
 
 #include <windows.h>
+#include <thread>
+#include <future>
+#include <chrono>
 
 #include "SnakeWindow.h"
 #include "Board.h"
-
-// Window Procedure declaration
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam); 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
@@ -25,7 +25,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	ShowWindow(win.Window(), nCmdShow);
 
 	MSG msg = { };
+	SetTimer(win.Window(), 1, 500, NULL);
 	while (GetMessage(&msg, NULL, 0, 0)) {
+		if (msg.message == WM_TIMER) {
+			SetTimer(win.Window(), 1, 100, NULL);
+		}
+		if (!board.isAlive()) {
+			MessageBox(NULL, (LPCWSTR)L"Game Over", (LPCWSTR)L"Game Over", MB_OK);
+			SendMessage(win.Window(), WM_DESTROY, NULL, NULL);
+		}
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -75,30 +83,3 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	return 0;
 }
-
-/*
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(hwnd, &ps);
-
-		// All painting occurs here, between BeginPaint and EndPaint.
-
-		FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
-
-		EndPaint(hwnd, &ps);
-	}
-	return 0;
-
-	}
-	return DefWindowProc(hwnd, uMsg, wParam, lParam);
-}
-*/
