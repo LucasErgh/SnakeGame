@@ -130,7 +130,7 @@
     <ClCompile Include="Apple.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="Board.cpp" />
-    <ClCompile Include="CellList.cpp" />
+    <ClCompile Include="ControlInterface.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeGame.cpp" />
     <ClCompile Include="SnakeNode.cpp" />
@@ -141,7 +141,7 @@
     <ClInclude Include="Apple.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="Board.h" />
-    <ClInclude Include="CellList.h" />
+    <ClInclude Include="ControlInterface.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeNode.h" />

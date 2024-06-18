@@ -3,7 +3,7 @@
 #include "SnakeNode.h"
 
 Snake::Snake() {
-	head = new SnakeNode(std::make_pair(0, 0), nullptr, nullptr);
+	head = new SnakeNode(std::make_pair(1, 1), nullptr, nullptr);
 	tail = head;
 	lastDirection = up;
 	queuedDirection1 = none;

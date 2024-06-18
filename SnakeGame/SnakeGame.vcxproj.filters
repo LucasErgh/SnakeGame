@@ -33,13 +33,13 @@
     <ClCompile Include="TestView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CellList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BaseWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SnakeWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,9 +62,6 @@
     <ClInclude Include="TestView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CellList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SnakeWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StateInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

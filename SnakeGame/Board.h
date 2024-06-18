@@ -3,7 +3,6 @@
 #include <vector>
 #include "Snake.h"
 #include "Apple.h"
-#include "CellList.h"
 
 class Board
 {
