@@ -2,6 +2,8 @@
 #include "DataTypes.h"
 #include "SnakeNode.h"
 
+#include <time.h>
+
 Snake::Snake() {
 	head = new SnakeNode(std::make_pair(1, 1), nullptr, nullptr);
 	tail = head;
@@ -172,4 +174,47 @@ bool Snake::outOfBounds(int width, int height) {
 	if (headCords.first <= 0 || headCords.second <= 0 || headCords.first > width || headCords.second > height)
 		return true;
 	return false;
+}
+
+SnakeNode* SnakeNode::getFront() {
+	return front;
+}
+
+SnakeNode* SnakeNode::getBack() {
+	return back;
+}
+
+cords SnakeNode::getCords() {
+	return cordinates;
+}
+
+void SnakeNode::newFront(SnakeNode* newFront) {
+	this->front = newFront;
+	newFront->back = this;
+}
+
+void SnakeNode::newBack(SnakeNode* newBack) {
+	this->back = newBack;
+	if (newBack != nullptr)
+		newBack->front = this;
+}
+
+SnakeNode::SnakeNode(cords cordinates, SnakeNode* front, SnakeNode* back) {
+	this->cordinates = cordinates;
+	this->front = front;
+	this->back = back;
+}
+
+Apple::Apple() {
+	srand(time(0));
+}
+
+cords Apple::moveApple(int width, int height) {
+
+	cordinates = std::make_pair(((rand() % height) + 1), ((rand() % width) + 1));
+	return cordinates;
+}
+
+cords Apple::getCords() {
+	return cordinates;
 }

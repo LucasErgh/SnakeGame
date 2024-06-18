@@ -1,7 +1,6 @@
 #include <utility> // std::pair
 
 #include "DataTypes.h"
-#include "SnakeNode.h"
 
 #pragma once
 class Snake
@@ -53,4 +52,31 @@ private:
 	Direction queuedDirection2;
 	int size;
 	int maxSize;
+};
+
+class SnakeNode {
+public:
+	SnakeNode(cords cordinates, SnakeNode* front, SnakeNode* back);
+	SnakeNode* getFront();
+	SnakeNode* getBack();
+	void newFront(SnakeNode* newFront);
+	void newBack(SnakeNode* newBack);
+	cords getCords();
+
+private:
+	SnakeNode* front;
+	SnakeNode* back;
+	cords cordinates;
+};
+
+class Apple {
+public:
+	Apple();
+
+	cords getCords();
+
+	cords moveApple(int width, int height);
+
+private:
+	cords cordinates;
 };
