@@ -6,9 +6,12 @@
 #include <thread>
 #include <future>
 #include <chrono>
+#include <cmath>
 
 #include "SnakeWindow.h"
 #include "Board.h"
+
+int GetSpeed(int);
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
@@ -25,10 +28,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	ShowWindow(win.Window(), nCmdShow);
 
 	MSG msg = { };
-	SetTimer(win.Window(), 1, 500, NULL);
+	
+	SetTimer(win.Window(), 1, GetSpeed(board.Score()) , NULL);
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		if (msg.message == WM_TIMER) {
-			SetTimer(win.Window(), 1, 100, NULL);
+			SetTimer(win.Window(), 1, GetSpeed(board.Score()), NULL);
 		}
 
 		TranslateMessage(&msg);
@@ -41,48 +45,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		}
 	}
 
-	/*// Register the window class
-	const wchar_t CLASS_NAME[] = L"Sample Window Class"; // Name the window class 
-
-	WNDCLASS wc = { };	// Define the structure
-
-	wc.lpfnWndProc = WindowProc;	// Set Window Procedure
-	wc.hInstance = hInstance;		// Sets handle to the application instance
-	wc.lpszClassName = CLASS_NAME;	// Identifies the window class
-
-	RegisterClass(&wc);	// This function registers the window class with the operating system
-
-	// Create Window Reference https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexa
-	HWND hwnd = CreateWindowEx(
-		0,								// Optional window styles
-		CLASS_NAME,						// Window class
-		L"Learn to Program Windows",	// Window text
-		WS_OVERLAPPEDWINDOW,			// Window style
-
-		// Size and position
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		
-		NULL,		// Parent window
-		NULL,		// Menu
-		hInstance,	// Instance handle
-		NULL		// Additional application data
-	);
 	
-	if (hwnd == NULL) {
-		return 0;
-	}
-
-	ShowWindow(hwnd, nCmdShow); 
-	// remember nCmdShow is a flag that indicates if the window is minimized, maximized or shown normally
-
-
-	MSG msg = { };
-
-	while (GetMessage(&msg, NULL, 0, 0) > 0) // GetMessage returns 0 if PostQuitMessage was called
-	{
-		TranslateMessage(&msg);	// Translates message to keypress
-		DispatchMessage(&msg);	// Calls corrosponding Window Procedure
-	}*/
 
 	return 0;
+}
+
+int GetSpeed(int size) {
+	const int start = 400;
+	const int max = 80;
+	const double decayFactor = 0.95;
+	int speed;
+
+	if (size < 4) return start;
+	else 
+		speed = static_cast<int>(start * std::pow(decayFactor, size-3));
+
+	if (speed < max) return max;
+
+	return speed;
 }
