@@ -3,11 +3,11 @@
 #include "Apple.h"
 
 Apple::Apple() {
-
+	srand(time(0));
 }
 
 cords Apple::moveApple(int width, int height) {
-	srand(time(0));
+	
 	cordinates = std::make_pair(((rand() % height) + 1), ((rand() % width) + 1));
 	return cordinates;
 }

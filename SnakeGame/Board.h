@@ -22,6 +22,8 @@ public:
 
 	bool isAlive();
 
+	int Score();
+
 private:
 	int width, height;
 	Snake snake;

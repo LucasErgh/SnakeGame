@@ -30,12 +30,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		if (msg.message == WM_TIMER) {
 			SetTimer(win.Window(), 1, 100, NULL);
 		}
-		if (!board.isAlive()) {
-			MessageBox(NULL, (LPCWSTR)L"Game Over", (LPCWSTR)L"Game Over", MB_OK);
-			SendMessage(win.Window(), WM_DESTROY, NULL, NULL);
-		}
+
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		if (!board.isAlive()) {
+			std::wstring score = L"Game Over! Your score is: " + std::to_wstring(board.Score());
+			MessageBox(NULL, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
+			SendMessage(win.Window(), WM_DESTROY, NULL, NULL);
+		}
 	}
 
 	/*// Register the window class

@@ -2,6 +2,10 @@
 #include <utility>
 #include "Board.h"
 
+int Board::Score() {
+	return snake.getSize();
+}
+
 Board::Board(int width, int height) : width(width), height(height) {
 	snake = Snake(std::make_pair(height/2, width/2));
 	gameOver = false;

@@ -20,10 +20,6 @@ HRESULT SnakeWindow::CreateGraphicsResources() {
 		{
 			const D2D1_COLOR_F color = D2D1::ColorF(1.0f, 1.0f, 0);
 			hr = pRenderTarget->CreateSolidColorBrush(color, &pBrush);
-
-			if (SUCCEEDED(hr)) {
-				CalculateLayout();
-			}
 		}
 	}
 	return hr;
@@ -49,6 +45,7 @@ void SnakeWindow::OnPaint() {
 			int offset = 10;
 			int scale = 40;
 			int rows = 10;
+			float cellBoarder = .8;
 
 			pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Black));
 			for (int i = 0; i <= rows; i++) {
@@ -59,20 +56,49 @@ void SnakeWindow::OnPaint() {
 			// Draw Snake Cells
 
 			std::vector <cell> list = info->board->updateBoard().getList();
-			for (cell cur : list) {
+			cell* last = NULL;
+			for (cell &cur : list) {
+				int left = offset + cur.first.first * scale - scale * cellBoarder, 
+					top = offset + cur.first.second * scale - scale * cellBoarder,
+					right = offset + cur.first.first * scale - scale * (1 - cellBoarder),
+					bottem = offset + cur.first.second * scale - scale * (1 - cellBoarder);
 				switch (cur.second) {
 				case 0:
 					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Red));
+					ellipse = D2D1::Ellipse(D2D1::Point2F(offset + cur.first.first * scale - scale / 2, offset + cur.first.second * scale - scale / 2), scale * .4, scale * .4);
+					pRenderTarget->FillEllipse(ellipse, pBrush);
 					break;
 				case 1:
+					last = &cur;
 					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Green));
+					rectangle = D2D1::RectF(left, top, right, bottem);
+					pRenderTarget->FillRectangle(rectangle, pBrush);
 					break;
 				case 2:
 					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::GreenYellow));
+					if (last != NULL && cur.first.first == last->first.first) { // This means they are in the same column
+						if (cur.first.second > last->first.second) { // this means the last was above the cur
+							top -= scale * ((1 - cellBoarder) * 2);
+						}
+						else { 
+							bottem += scale * ((1 - cellBoarder) * 2);
+						}
+					}
+					else if (last != NULL){ // Otherwise they are in the same row
+						if (cur.first.first < last->first.first) { // this means last is right of cur
+							right += scale * ((1 - cellBoarder) * 2);
+						}
+						else {
+							left -= scale * ((1 - cellBoarder) * 2);
+						}
+
+					}
+					last = &cur;
+					rectangle = D2D1::RectF(left, top, right, bottem);
+					pRenderTarget->FillRectangle(rectangle, pBrush);
 					break;
 				}
-				ellipse = D2D1::Ellipse(D2D1::Point2F(offset + cur.first.first * scale - scale / 2, offset + cur.first.second * scale - scale / 2), scale * .4, scale * .4);
-				pRenderTarget->FillEllipse(ellipse, pBrush);
+				
 			}
 		}
 
@@ -84,26 +110,14 @@ void SnakeWindow::OnPaint() {
 	}
 }
 
-void SnakeWindow::CalculateLayout() {
-	if (pRenderTarget != NULL)
-	{
-		D2D1_SIZE_F size = pRenderTarget->GetSize();
-		const float x = size.width / 2;
-		const float y = size.height / 2;
-		const float radius = min(x, y);
-		ellipse = D2D1::Ellipse(D2D1::Point2F(x, y), radius, radius);
-	}
-}
-
 void SnakeWindow::Resize() {
 	if (pRenderTarget != NULL) {
 		RECT rc;
 		GetClientRect(m_hwnd, &rc);
 
 		D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
-
+		
 		pRenderTarget->Resize(size);
-		CalculateLayout();
 		InvalidateRect(m_hwnd, NULL, FALSE);
 	}
 }
