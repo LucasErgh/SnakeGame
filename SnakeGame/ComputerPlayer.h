@@ -11,7 +11,5 @@ public:
 
 	void ControlInterface::endGame();
 
-private:
-
 };
 

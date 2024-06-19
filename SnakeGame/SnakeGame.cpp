@@ -12,16 +12,27 @@
 #include "Player.h"
 #include "ControlInterface.h"
 #include "StateInfo.h"
+#include "LaunchWindow.h"
 
 int GetSpeed(int);
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	int rows = 10, columns = 10;
-	ControlInterface* model = new Player(10, 10);
-	StateInfo info(rows, columns, 40, model);
+	LaunchWindow win;
 
-	SnakeWindow win(&info);
+	if (!win.Create(L"Launcher", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, 120, 160)) {
+		return 0;
+	}
+
+	ShowWindow(win.Window(), nCmdShow);
+
+	MSG msg = {};
+
+	while (GetMessage(&msg, NULL, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	/*SnakeWindow win(&info);
 
 	if (!win.Create(L"Snake", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, 440, 460)) {
 		return 0;
@@ -45,7 +56,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 			MessageBox(NULL, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
 			SendMessage(win.Window(), WM_DESTROY, NULL, NULL);
 		}
-	}
+	}*/
 
 	
 

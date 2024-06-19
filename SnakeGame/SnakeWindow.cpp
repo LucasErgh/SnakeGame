@@ -1,4 +1,5 @@
 #include <vector> 
+#include <string>
 
 #include "SnakeWindow.h"
 
@@ -133,7 +134,8 @@ LRESULT SnakeWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	case WM_DESTROY:
 		DiscardGraphicsResources();
 		SafeRelease(&pFactory);
-		PostQuitMessage(0);
+		delete info;
+		
 		return 0;
 
 	case WM_PAINT:
@@ -141,10 +143,14 @@ LRESULT SnakeWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return 0;
 
 	case WM_TIMER:
+		SetTimer(this->Window(), 1, 400, NULL);
 		if (!info->model->DoTurn()) {
 			// add end game
 			info->model->endGame();
 			KillTimer(m_hwnd, 1);
+			std::wstring score = L"Game Over! Your score is: " + std::to_wstring(info->model->Score());
+			MessageBox(m_hwnd, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
+			DestroyWindow(this->Window());
 			return 0;
 		}
 		OnPaint();

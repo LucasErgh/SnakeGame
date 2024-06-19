@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="ComputerPlayer.cpp" />
     <ClCompile Include="ControlInterface.cpp" />
+    <ClCompile Include="LaunchWindow.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeGame.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="ComputerPlayer.h" />
     <ClInclude Include="ControlInterface.h" />
     <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="LaunchWindow.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeWindow.h" />
