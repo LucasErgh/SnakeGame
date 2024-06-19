@@ -1,7 +1,7 @@
 #include "ControlInterface.h"
 
 ControlInterface::ControlInterface(int width, int height) : width(width), height(height), gameOver(false) {
-	snake = Snake(std::make_pair(width / 2, height / 2));
+	snake = Snake(std::make_pair(width / 2, height / 2), width, height);
 
 	apple = Apple();
 	do {

@@ -142,6 +142,7 @@
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="LaunchWindow.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SearchTreeNode.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeWindow.h" />
     <ClInclude Include="StateInfo.h" />

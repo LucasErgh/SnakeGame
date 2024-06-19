@@ -4,6 +4,8 @@
 #include <time.h>
 
 Snake::Snake() {
+	height = 10;
+	width = 10;
 	head = new SnakeNode(std::make_pair(1, 1), nullptr, nullptr);
 	tail = head;
 	lastDirection = up;
@@ -13,7 +15,7 @@ Snake::Snake() {
 	maxSize = size;
 }
 
-Snake::Snake(cords start) {
+Snake::Snake(cords start, int width, int height) : width(width), height(height) {
 	head = new SnakeNode(start, nullptr, nullptr);
 	tail = head;
 	lastDirection = up;
@@ -21,6 +23,26 @@ Snake::Snake(cords start) {
 	queuedDirection2 = none;
 	size = 1;
 	maxSize = size;
+}
+
+Snake* Snake::MakeCopy() {
+	Snake* NewSnake = new Snake(this->headLocation(), width, height);
+	NewSnake->maxSize = this->maxSize;
+	NewSnake->size = this->size;
+	NewSnake->lastDirection = this->lastDirection;
+	NewSnake->queuedDirection1 = this->queuedDirection1;
+	NewSnake->queuedDirection2 = this->queuedDirection2;
+
+	SnakeNode* cur = this->head;
+	SnakeNode* newCur = NewSnake->head;
+	while (cur->getBack() != NULL) {
+		cur = cur->getBack();
+		newCur->newBack(new SnakeNode(cur->getCords(), newCur, NULL));
+		newCur = newCur->getBack();
+	}
+	NewSnake->tail = newCur;
+
+	return NewSnake;
 }
 
 cords Snake::move() {
@@ -168,7 +190,9 @@ bool Snake::snakeCollision() {
 	return false;
 }
 
-bool Snake::outOfBounds(int width, int height) {
+Direction Snake::GetDirection() { return this->lastDirection; }
+
+bool Snake::outOfBounds() {
 	cords headCords = headLocation();
 	if (headCords.first <= 0 || headCords.second <= 0 || headCords.first > width || headCords.second > height)
 		return true;
@@ -210,7 +234,7 @@ Apple::Apple() {
 
 cords Apple::moveApple(int width, int height) {
 
-	cordinates = std::make_pair(((rand() % height) + 1), ((rand() % width) + 1));
+	cordinates = std::make_pair(((rand() % width) + 1), ((rand() % height) + 1));
 	return cordinates;
 }
 

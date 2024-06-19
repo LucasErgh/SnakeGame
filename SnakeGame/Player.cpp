@@ -2,7 +2,7 @@
 #include "ControlInterface.h"
 
 Player::Player(int width, int height){
-	snake = Snake(std::make_pair(width / 2, height / 2));
+	snake = Snake(std::make_pair(width / 2, height / 2), width, height);
 	this->width = width;
 	this->height = height;
 	this->gameOver = false;
@@ -29,7 +29,7 @@ bool Player::DoTurn() {
 		gameOver = true;
 		return false;
 	}
-	else if (snake.outOfBounds(width, height)) {
+	else if (snake.outOfBounds()) {
 		gameOver = true;
 		return false;
 	}

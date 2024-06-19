@@ -6,6 +6,7 @@
 #include "SnakeWindow.h"
 #include "ControlInterface.h"
 #include "Player.h"
+#include "ComputerPlayer.h"
 
 class LaunchWindow : public BaseWindow<LaunchWindow>
 {

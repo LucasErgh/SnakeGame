@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <windows.h>
 #include <d2d1.h>
 #pragma comment(lib, "d2d1")
@@ -7,6 +8,8 @@
 #include "BaseWindow.h"
 #include "DataTypes.h"
 #include "StateInfo.h"
+#include <vector> 
+#include <string>
 
 class SnakeWindow : public BaseWindow<SnakeWindow>
 {

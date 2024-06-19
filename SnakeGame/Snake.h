@@ -24,7 +24,7 @@ public:
 	Snake();
 	// If no start cords are given starts at (0, 0)
 
-	Snake(cords start);
+	Snake(cords start, int width, int height);
 	// Constructor creates snake with one node at given cordinate
 
 	cords move();
@@ -57,7 +57,11 @@ public:
 
 	bool snakeCollision();
 
-	bool outOfBounds(int width, int height);
+	bool outOfBounds();
+
+	Snake* MakeCopy();
+
+	Direction GetDirection();
 
 private:
 	SnakeNode *head;
@@ -67,6 +71,9 @@ private:
 	Direction queuedDirection2;
 	int size;
 	int maxSize;
+	
+	int width;
+	int height;
 };
 
 

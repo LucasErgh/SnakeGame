@@ -20,7 +20,7 @@ public:
 
 	int Score();
 
-//protected:
+protected:
 	const int growthRate = 1;
 	int width, height;
 	Snake snake;

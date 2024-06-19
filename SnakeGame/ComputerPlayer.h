@@ -1,5 +1,9 @@
 #pragma once
+
+#include <vector>
+
 #include "ControlInterface.h"
+
 class ComputerPlayer : public ControlInterface
 {
 public:
@@ -11,5 +15,6 @@ public:
 
 	void ControlInterface::endGame();
 
+	std::vector<Direction>* directions;
 };
 

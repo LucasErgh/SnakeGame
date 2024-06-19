@@ -1,6 +1,3 @@
-#include <vector> 
-#include <string>
-
 #include "SnakeWindow.h"
 
 HRESULT SnakeWindow::CreateGraphicsResources() {
@@ -44,13 +41,14 @@ void SnakeWindow::OnPaint() {
 		if (info->model->isAlive()) {
 			// Draw Grid
 			int offset = 10;
-			int scale = 40;
-			int rows = 10;
+			int scale = info->scale;
+			int rows = info->rows;
+			int columns = info->columns;
 			float cellBoarder = .8;
 
 			pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Black));
 			for (int i = 0; i <= rows; i++) {
-				pRenderTarget->DrawLine(D2D1::Point2F(i * scale + offset, offset), D2D1::Point2F(i * scale + offset, rows * scale + offset), pBrush, 1);
+				pRenderTarget->DrawLine(D2D1::Point2F(i * scale + offset, offset), D2D1::Point2F(i * scale + offset, columns * scale + offset), pBrush, 1);
 				pRenderTarget->DrawLine(D2D1::Point2F(offset, i * scale + offset), D2D1::Point2F(rows * scale + offset, i * scale + offset), pBrush, 1);
 			}
 
@@ -111,6 +109,21 @@ void SnakeWindow::OnPaint() {
 	}
 }
 
+int GetTime(int size) {
+	const int start = 400;
+	const int max = 80;
+	const double decayFactor = 0.95;
+	int speed;
+
+	if (size < 4) return start;
+	else
+		speed = static_cast<int>(start * std::pow(decayFactor, size - 3));
+
+	if (speed < max) return max;
+
+	return speed;
+}
+
 void SnakeWindow::Resize() {
 	if (pRenderTarget != NULL) {
 		RECT rc;
@@ -143,7 +156,7 @@ LRESULT SnakeWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return 0;
 
 	case WM_TIMER:
-		SetTimer(this->Window(), 1, 400, NULL);
+		SetTimer(this->Window(), 1, GetTime(info->model->Score()), NULL);
 		if (!info->model->DoTurn()) {
 			// add end game
 			info->model->endGame();

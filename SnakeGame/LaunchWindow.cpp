@@ -15,21 +15,32 @@ void LaunchWindow::OnPaint() {
 }
 
 int LaunchWindow::LaunchSnake(int option) {
-	int rows = 10, columns = 10;
-	ControlInterface* model = new Player(10, 10);
-	StateInfo* info = new StateInfo(rows, columns, 40, model);
+	int rows = 9, columns = 9, cellScale = 40;
+	ControlInterface* model; 
+	StateInfo* info;
 	if (option == NormalGame) {
+		model = new Player(rows, columns);
+		info = new StateInfo(rows, columns, cellScale, model);
+
 		MainGameWnd = new SnakeWindow(info);
 
-		if (!MainGameWnd->Create(L"Snake", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, 440, 460)) {
+		if (!MainGameWnd->Create(L"Snake", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, cellScale * rows + cellScale, cellScale * rows + cellScale + 20)) {
 			return 0;
 		}
 		ShowWindow(MainGameWnd->Window(), SW_SHOW);
 		SetTimer(MainGameWnd->Window(), 1, 400, NULL);
 	}
 	else if (option == ComputerGame) {
-		//todo impliment computer game
+		model = new ComputerPlayer(rows, columns);
+		info = new StateInfo(rows, columns, cellScale, model);
 
+		MainGameWnd = new SnakeWindow(info);
+
+		if (!MainGameWnd->Create(L"Snake", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, cellScale * rows + cellScale, cellScale * rows + cellScale + 20)) {
+			return 0;
+		}
+		ShowWindow(MainGameWnd->Window(), SW_SHOW);
+		SetTimer(MainGameWnd->Window(), 1, 400, NULL);
 	}
 }
 
@@ -79,7 +90,6 @@ LRESULT LaunchWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		LaunchSnake(wmID);
 		break;
 	}
-
 	case WM_PAINT:
 		OnPaint();
 		break;
