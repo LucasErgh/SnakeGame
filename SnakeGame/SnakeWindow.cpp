@@ -40,7 +40,7 @@ void SnakeWindow::OnPaint() {
 
 		pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		if (info->board->isAlive()) {
+		if (info->model->isAlive()) {
 			// Draw Grid
 			int offset = 10;
 			int scale = 40;
@@ -55,7 +55,7 @@ void SnakeWindow::OnPaint() {
 
 			// Draw Snake Cells
 
-			std::vector <cell> list = info->board->updateBoard().getList();
+			std::vector <cell> list = info->model->GetCells();
 			cell* last = NULL;
 			for (cell &cur : list) {
 				int left = offset + cur.first.first * scale - scale * cellBoarder, 
@@ -141,9 +141,9 @@ LRESULT SnakeWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return 0;
 
 	case WM_TIMER:
-		if (!info->board->doTurn()) {
+		if (!info->model->DoTurn()) {
 			// add end game
-			info->board->endGame();
+			info->model->endGame();
 			KillTimer(m_hwnd, 1);
 			return 0;
 		}
@@ -155,25 +155,24 @@ LRESULT SnakeWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		
 		// W is pressed
 		case 0x57:
-			info->board->ChangeDirection(up);
+			info->model->ChangeDirection(up);
 			break;
 
 		// A is pressed
 		case 0x41:
-			info->board->ChangeDirection(left);
+			info->model->ChangeDirection(left);
 			break;
 
 		// S is pressed
 		case 0x53:
-			info->board->ChangeDirection(down);
+			info->model->ChangeDirection(down);
 			break;
 
 		// D is pressed
 		case 0x44:
-			info->board->ChangeDirection(right);
+			info->model->ChangeDirection(right);
 			break;
 		}
-
 
 	case WM_SIZE:
 		Resize();

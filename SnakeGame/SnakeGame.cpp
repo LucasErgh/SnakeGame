@@ -10,14 +10,16 @@
 
 #include "SnakeWindow.h"
 #include "Board.h"
+#include "Player.h"
+#include "ControlInterface.h"
 
 int GetSpeed(int);
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
 	int rows = 10, columns = 10;
-	Board board(columns, rows);
-	StateInfo info(rows, columns, 40, &board);
+	ControlInterface* model = new Player(10, 10);
+	StateInfo info(rows, columns, 40, model);
 
 	SnakeWindow win(&info);
 
@@ -29,17 +31,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 	MSG msg = { };
 	
-	SetTimer(win.Window(), 1, GetSpeed(board.Score()) , NULL);
+	SetTimer(win.Window(), 1, GetSpeed(model->Score()) , NULL);
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		if (msg.message == WM_TIMER) {
-			SetTimer(win.Window(), 1, GetSpeed(board.Score()), NULL);
+			SetTimer(win.Window(), 1, GetSpeed(model->Score()), NULL);
 		}
 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
-		if (!board.isAlive()) {
-			std::wstring score = L"Game Over! Your score is: " + std::to_wstring(board.Score());
+		if (!model->isAlive()) {
+			std::wstring score = L"Game Over! Your score is: " + std::to_wstring(model->Score());
 			MessageBox(NULL, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
 			SendMessage(win.Window(), WM_DESTROY, NULL, NULL);
 		}

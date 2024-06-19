@@ -21,19 +21,13 @@
     <ClCompile Include="Snake.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Board.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TestView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SnakeWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ControlInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,22 +38,16 @@
     <ClInclude Include="Snake.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Board.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TestView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SnakeWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StateInfo.h">
+    <ClInclude Include="ControlInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ControlInterface.h">
+    <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

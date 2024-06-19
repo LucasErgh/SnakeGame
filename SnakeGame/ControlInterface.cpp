@@ -1,6 +1,6 @@
 #include "ControlInterface.h"
 
-ControlInterface::ControlInterface(int width, int height) : width(width), height(height){
+ControlInterface::ControlInterface(int width, int height) : width(width), height(height), gameOver(false) {
 	snake = Snake(std::make_pair(width / 2, height / 2));
 
 	apple = Apple();
@@ -18,6 +18,7 @@ CellList ControlInterface::GetCells() {
 	for (auto cur : snake.bodyLocation()) {
 		list.push_back(std::make_pair(cur, bodyCell));
 	}
+	return list;
 }
 bool ControlInterface::isAlive() {
 	return !gameOver;

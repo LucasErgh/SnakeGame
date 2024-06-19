@@ -127,23 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BaseWindow.cpp" />
-    <ClCompile Include="Board.cpp" />
     <ClCompile Include="ControlInterface.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeGame.cpp" />
     <ClCompile Include="SnakeWindow.cpp" />
-    <ClCompile Include="TestView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseWindow.h" />
-    <ClInclude Include="Board.h" />
     <ClInclude Include="ControlInterface.h" />
     <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeWindow.h" />
-    <ClInclude Include="StateInfo.h" />
-    <ClInclude Include="TestView.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,5 @@
 #include "Snake.h"
 #include "DataTypes.h"
-#include "SnakeNode.h"
 
 #include <time.h>
 
