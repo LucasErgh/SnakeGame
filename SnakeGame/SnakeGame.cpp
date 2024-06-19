@@ -9,9 +9,9 @@
 #include <cmath>
 
 #include "SnakeWindow.h"
-#include "Board.h"
 #include "Player.h"
 #include "ControlInterface.h"
+#include "StateInfo.h"
 
 int GetSpeed(int);
 

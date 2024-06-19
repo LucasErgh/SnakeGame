@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComputerPlayer.cpp" />
     <ClCompile Include="ControlInterface.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snake.cpp" />
@@ -135,11 +136,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseWindow.h" />
+    <ClInclude Include="ComputerPlayer.h" />
     <ClInclude Include="ControlInterface.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeWindow.h" />
+    <ClInclude Include="StateInfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

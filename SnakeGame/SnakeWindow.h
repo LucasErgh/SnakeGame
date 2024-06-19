@@ -5,6 +5,7 @@
 #pragma comment(lib, "d2d1")
 
 #include "BaseWindow.h"
+#include "DataTypes.h"
 #include "StateInfo.h"
 
 class SnakeWindow : public BaseWindow<SnakeWindow>
