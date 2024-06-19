@@ -11,14 +11,16 @@ class LaunchWindow : public BaseWindow<LaunchWindow>
 {
 public:
 	void OnPaint();
-	int LaunchSnake();
+	int LaunchSnake(int);
+	void CreateButtons();
 
 	SnakeWindow *MainGameWnd;
 	HWND CompetetorWnd;
-	HWND StartButton;
+	HWND SinglePlayerButton;
+	HWND ComputerButton;
 
 
-	LaunchWindow() : MainGameWnd(NULL), CompetetorWnd(NULL), StartButton(NULL) { };
+	LaunchWindow() : MainGameWnd(NULL), CompetetorWnd(NULL), SinglePlayerButton(NULL), ComputerButton(NULL) { };
 
 	PCWSTR ClassName() const { return L"Snake"; }
 	LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);

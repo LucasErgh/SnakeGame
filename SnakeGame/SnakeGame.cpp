@@ -20,7 +20,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 {
 	LaunchWindow win;
 
-	if (!win.Create(L"Launcher", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, 120, 160)) {
+	if (!win.Create(L"Launcher", WS_OVERLAPPEDWINDOW)) {
 		return 0;
 	}
 
