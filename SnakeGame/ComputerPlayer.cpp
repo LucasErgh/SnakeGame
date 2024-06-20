@@ -3,9 +3,9 @@
 
 ComputerPlayer::ComputerPlayer(int width, int height) : directions(NULL){
 	//snake = Snake(std::make_pair(width / 2, height / 2), width, height);
-	//this->width = width;
-	//this->height = height;
-	//this->gameOver = false;
+	this->width = width;
+	this->height = height;
+	this->gameOver = false;
 
 	//apple = Apple();
 	//do {
@@ -21,7 +21,7 @@ bool ComputerPlayer::DoTurn() {
 	if (directions == NULL) {
 		SearchTreeNode tree(apple.getCords(), snake.MakeCopy(), none);
 		do {
-			directions = tree.Run();
+			directions = tree.FindPath();
 			tree.DestroyTree();
 		} while (directions == NULL);
 		
