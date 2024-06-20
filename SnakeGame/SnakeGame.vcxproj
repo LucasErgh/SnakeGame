@@ -130,6 +130,7 @@
     <ClCompile Include="ComputerPlayer.cpp" />
     <ClCompile Include="ControlInterface.cpp" />
     <ClCompile Include="LaunchWindow.cpp" />
+    <ClCompile Include="PathFinderV2.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeGame.cpp" />
@@ -141,6 +142,8 @@
     <ClInclude Include="ControlInterface.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="LaunchWindow.h" />
+    <ClInclude Include="PathFinderV2.h" />
+    <ClInclude Include="PathFindingModel.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SearchTreeNode.h" />
     <ClInclude Include="Snake.h" />

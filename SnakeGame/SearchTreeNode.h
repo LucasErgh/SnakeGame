@@ -3,8 +3,9 @@
 #include <vector>
 
 #include "Snake.h"
+#include "PathFindingModel.h"
 
-class SearchTreeNode
+class SearchTreeNode : public PathFindingModel
 {
 	SearchTreeNode* Children[3] = { };
 
@@ -55,10 +56,8 @@ class SearchTreeNode
 				PopulateChildren();
 			}
 		}
-		
 	}
-
-	std::vector<Direction>* FindPath() {
+	std::vector<Direction>* SearchPath() {
 		
 		if (FindGoal == true) {
 			std::vector<Direction>* directions = new std::vector<Direction>;
@@ -73,7 +72,7 @@ class SearchTreeNode
 			for (auto cur : Children) {
 				if (cur == NULL)
 					continue;
-				directions = cur->FindPath();
+				directions = cur->SearchPath();
 				if (directions != NULL) {
 					if (depth != 1)
 						directions->push_back(dir);
@@ -99,12 +98,12 @@ public:
 		}
 	}
 
-	std::vector<Direction>* Run() {
+	std::vector<Direction>* PathFindingModel::FindPath() {
 		std::vector<Direction>* path = NULL;
 		int searchDepth = 1;
 		do {
 			PopulateLayer(searchDepth++);
-			path = FindPath();
+			path = SearchPath();
 		} while (path == NULL);
 		return path;
 	}

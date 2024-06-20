@@ -2,15 +2,15 @@
 #include "SearchTreeNode.h"
 
 ComputerPlayer::ComputerPlayer(int width, int height) : directions(NULL){
-	snake = Snake(std::make_pair(width / 2, height / 2), width, height);
-	this->width = width;
-	this->height = height;
-	this->gameOver = false;
+	//snake = Snake(std::make_pair(width / 2, height / 2), width, height);
+	//this->width = width;
+	//this->height = height;
+	//this->gameOver = false;
 
-	apple = Apple();
-	do {
-		apple.moveApple(this->width, this->height);
-	} while (snake.isSnake(apple.getCords()));
+	//apple = Apple();
+	//do {
+	//	apple.moveApple(this->width, this->height);
+	//} while (snake.isSnake(apple.getCords()));
 }
 
 bool ComputerPlayer::DoTurn() {

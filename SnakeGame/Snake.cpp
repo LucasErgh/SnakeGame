@@ -35,10 +35,10 @@ Snake* Snake::MakeCopy() {
 
 	SnakeNode* cur = this->head;
 	SnakeNode* newCur = NewSnake->head;
-	while (cur->getBack() != NULL) {
-		cur = cur->getBack();
-		newCur->newBack(new SnakeNode(cur->getCords(), newCur, NULL));
-		newCur = newCur->getBack();
+	while (cur->back != NULL) {
+		cur = cur->back;
+		newCur->back = new SnakeNode(cur->cordinates, newCur, NULL);
+		newCur = newCur->back;
 	}
 	NewSnake->tail = newCur;
 
@@ -47,7 +47,7 @@ Snake* Snake::MakeCopy() {
 
 cords Snake::move() {
 	// Create new had location based on current head location
-	cords newLocation(head->getCords());
+	cords newLocation(head->cordinates);
 	Direction direction;
 
 	if (queuedDirection1 == none) 
@@ -80,7 +80,7 @@ cords Snake::move() {
 
 	// Create new Head with new cords
 	SnakeNode* newHead = new SnakeNode(newLocation, nullptr, head);
-	head->newFront(newHead);
+	head->front = newHead;
 	head = newHead;
 
 	// Grow snake and move tail
@@ -89,32 +89,32 @@ cords Snake::move() {
 	}
 	else { // if the snake doesn't need to grow make the tail the node infront of tail and delete the old tail
 		SnakeNode* oldTail = tail;
-		if (oldTail->getFront() == nullptr)
+		if (oldTail->front == nullptr)
 			tail = head;
 		else {
-			tail = oldTail->getFront();
-			tail->newBack(nullptr);
+			tail = oldTail->front;
+			tail->back = NULL;
 		}
 		delete oldTail;
 	}
-	return newHead->getCords();
+	return newHead->cordinates;
 }
 
 bool Snake::isSnake(cords cords) {
 	SnakeNode* cur = head;
 	while (true) {
-		if (cur->getCords() == cords) { // found a collision
-			return true;
-		}
-		if (cur->getBack() == nullptr) { // no collisions
+		if (cur->back == nullptr) { // no collisions
 			return false;
 		}
-		cur = cur->getBack();
+		if (cur->back->cordinates == cords) { // found a collision
+			return true;
+		}
+		cur = cur->back;
 	}
 }
 
 bool Snake::headCollision(cords cords) {
-	if (head->getCords() == cords) {
+	if (head->cordinates == cords) {
 		return true;
 	}
 	else {
@@ -155,15 +155,15 @@ void Snake::changeDirection(Direction dir) {
 }
 
 cords Snake::headLocation() {
-	return head->getCords();
+	return head->cordinates;
 }
 
 std::vector<cords> Snake::bodyLocation() {
 	SnakeNode* cur = head;
 	std::vector<cords> body;
 	for (int i = 1; i < size; ++i) {
-		cur = cur->getBack();
-		body.push_back(cur->getCords());
+		cur = cur->back;
+		body.push_back(cur->cordinates);
 	}
 	return body;
 }
@@ -174,9 +174,9 @@ int Snake::getSize() {
 
 void Snake::deleteNodes() {
 	SnakeNode* cur = tail;
-	while (cur->getFront() != nullptr) {
-		cur = cur->getFront();
-		delete cur->getBack();
+	while (cur->front != nullptr) {
+		cur = cur->front;
+		delete cur->back;
 	}
 	delete cur;
 }
@@ -184,7 +184,7 @@ void Snake::deleteNodes() {
 bool Snake::snakeCollision() {
 	std::vector<cords> body = bodyLocation();
 	for (auto cur : body) {
-		if (head->getCords() == cur)
+		if (head->cordinates == cur)
 			return true;
 	}
 	return false;
@@ -197,29 +197,6 @@ bool Snake::outOfBounds() {
 	if (headCords.first <= 0 || headCords.second <= 0 || headCords.first > width || headCords.second > height)
 		return true;
 	return false;
-}
-
-SnakeNode* SnakeNode::getFront() {
-	return front;
-}
-
-SnakeNode* SnakeNode::getBack() {
-	return back;
-}
-
-cords SnakeNode::getCords() {
-	return cordinates;
-}
-
-void SnakeNode::newFront(SnakeNode* newFront) {
-	this->front = newFront;
-	newFront->back = this;
-}
-
-void SnakeNode::newBack(SnakeNode* newBack) {
-	this->back = newBack;
-	if (newBack != nullptr)
-		newBack->front = this;
 }
 
 SnakeNode::SnakeNode(cords cordinates, SnakeNode* front, SnakeNode* back) {

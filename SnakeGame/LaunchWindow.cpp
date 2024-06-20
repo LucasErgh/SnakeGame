@@ -15,7 +15,7 @@ void LaunchWindow::OnPaint() {
 }
 
 int LaunchWindow::LaunchSnake(int option) {
-	int rows = 9, columns = 9, cellScale = 40;
+	int rows = 20, columns = 20, cellScale = 40;
 	ControlInterface* model; 
 	StateInfo* info;
 	if (option == NormalGame) {
