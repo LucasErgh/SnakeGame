@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "ControlInterface.h"
+#include "SearchTreeNode.h"
+#include "PathFinderV2.h"
 
 class ComputerPlayer : public ControlInterface
 {

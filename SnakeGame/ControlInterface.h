@@ -6,7 +6,7 @@
 class ControlInterface
 {
 public:
-	ControlInterface(int width = 10, int height = 10);
+	//ControlInterface(int width = 10, int height = 10);
 
 	virtual bool DoTurn() = 0;
 

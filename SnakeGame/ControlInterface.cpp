@@ -1,13 +1,13 @@
 #include "ControlInterface.h"
 
-ControlInterface::ControlInterface(int width, int height) : width(width), height(height), gameOver(false) {
-	snake = Snake(std::make_pair(width / 2, height / 2), width, height);
-
-	apple = Apple();
-	do {
-		apple.moveApple(this->width, this->height);
-	} while (snake.isSnake(apple.getCords()));
-}
+//ControlInterface::ControlInterface(int width, int height) : width(width), height(height), gameOver(false) {
+//	snake = Snake(std::make_pair(width / 2, height / 2), width, height);
+//
+//	apple = Apple();
+//	do {
+//		apple.moveApple(this->width, this->height);
+//	} while (snake.isSnake(apple.getCords()));
+//}
 
 CellList ControlInterface::GetCells() {
 	CellList list;

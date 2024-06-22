@@ -1,35 +1,33 @@
 #include "ComputerPlayer.h"
-#include "SearchTreeNode.h"
+
 
 ComputerPlayer::ComputerPlayer(int width, int height) : directions(NULL){
-	//snake = Snake(std::make_pair(width / 2, height / 2), width, height);
+	snake = Snake(std::make_pair(width / 2, height / 2), width, height);
 	this->width = width;
 	this->height = height;
 	this->gameOver = false;
 
-	//apple = Apple();
-	//do {
-	//	apple.moveApple(this->width, this->height);
-	//} while (snake.isSnake(apple.getCords()));
+	apple = Apple();
+	do {
+		apple.moveApple(this->width, this->height);
+	} while (snake.isSnake(apple.getCords()));
 }
 
 bool ComputerPlayer::DoTurn() {
-	if (directions != NULL && directions->empty()) {
+	if (directions != NULL && (directions->empty() || directions->size() == 1)) {
 		delete directions;
 		directions = NULL;
 	}
 	if (directions == NULL) {
-		SearchTreeNode tree(apple.getCords(), snake.MakeCopy(), none);
-		do {
-			directions = tree.FindPath();
-			tree.DestroyTree();
-		} while (directions == NULL);
-		
+		PathFindingModel* model = new PathFinderV2(&snake, apple.getCords());
+		directions = model->FindPath();
 	}
-	Direction direction = directions->back();
-	directions->pop_back();
+	if (directions != NULL) {
+		Direction direction = directions->back();
+		directions->pop_back();
+		snake.changeDirection(direction);
+	}
 
-	snake.changeDirection(direction);
 	snake.move();
 
 	if (snake.headLocation() == apple.getCords()) {

@@ -102,6 +102,9 @@ cords Snake::move() {
 
 bool Snake::isSnake(cords cords) {
 	SnakeNode* cur = head;
+	if (cur->cordinates == cords) {
+		return true;
+	}
 	while (true) {
 		if (cur->back == nullptr) { // no collisions
 			return false;
