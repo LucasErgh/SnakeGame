@@ -2,7 +2,7 @@
 
 
 ComputerPlayer::ComputerPlayer(int width, int height) : directions(NULL){
-	snake = Snake(std::make_pair(width / 2, height / 2), width, height);
+	snake = Snake(std::make_pair(width / 2 + 1, height / 2 + 1), width, height);
 	this->width = width;
 	this->height = height;
 	this->gameOver = false;
