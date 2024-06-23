@@ -31,6 +31,7 @@ public:
 					cur->alive = false;
 					cur->snake->deleteNodes();
 					delete cur->snake;
+					cur->snake = NULL;
 				}
 				break;
 			}
@@ -39,6 +40,7 @@ public:
 		if (Child == NULL) {
 			copy->deleteNodes();
 			delete copy;
+			copy = NULL;
 		}
 		// If this node has all of its children we delete its snake to save mem
 		bool hasAllChildren = true;
@@ -49,6 +51,7 @@ public:
 		}
 		if (hasAllChildren) {
 			this->snake->deleteNodes();
+			delete this->snake;
 			this->snake = NULL;
 		}
 
@@ -90,7 +93,7 @@ public:
 		bool running = true;
 		int searchDepth = 0; 
 		int lastDeepestNode = 0;
-		running = !TryShortestPath(root);
+		//running = !TryShortestPath(root);
 		while (running) {
 			//this is where ill pathfind when shortest path doesn't work
 			running = !GrowTree(root, ++searchDepth);
@@ -162,7 +165,16 @@ public:
 				break;
 			}
 		}
-
+		// Prune dead branches
+		bool allDead = true;
+		for (auto cur : node->Children) {
+			if (!cur || cur->alive == true) allDead = false;
+		}
+		if (allDead == true) {
+			DeleteChildren(node);
+			node->alive = false;
+			return false;
+		}
 		// Growing tree for each node and returning if any of them found the path
 		for (auto& cur : node->Children) {
 			if (cur && cur->alive) {
@@ -215,14 +227,10 @@ public:
 		}
 		return deepest;
 	}
-	void operator~() {
-		DeleteChildren(root);
-		delete root;
-		root = NULL;
-	}
 	void DeleteChildren(Node* node) {
 		for (auto& cur : node->Children) {
-			DeleteChildren(cur);
+			if(cur)
+				DeleteChildren(cur);
 			cur = NULL;
 		}
 		if (node->snake) {
@@ -230,6 +238,9 @@ public:
 			delete node->snake;
 			node->snake = NULL;
 		}
+	}
+	void PathFindingModel::Delete() {
+		DeleteChildren(root);
 	}
 private:
 	Node* root;

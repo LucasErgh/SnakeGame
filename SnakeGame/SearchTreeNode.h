@@ -108,10 +108,10 @@ public:
 		return path;
 	}
 
-	void DestroyTree() {
+	void PathFindingModel::Delete() {
 		for (auto cur : Children) {
 			if (cur != NULL) {
-				cur->DestroyTree();
+				cur->Delete();
 				delete cur;
 			}
 		}
