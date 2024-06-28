@@ -143,6 +143,7 @@
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="LaunchWindow.h" />
     <ClInclude Include="PathFinderV2.h" />
+    <ClInclude Include="PathFinderV3.h" />
     <ClInclude Include="PathFindingModel.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SearchTreeNode.h" />

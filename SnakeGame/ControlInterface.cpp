@@ -25,5 +25,5 @@ bool ControlInterface::isAlive() {
 }
 
 int ControlInterface::Score() {
-	return snake.getSize();
+	return snake.size;
 }

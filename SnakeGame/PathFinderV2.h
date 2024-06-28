@@ -18,16 +18,20 @@ public:
 		}
 		// Create info for child
 		Node* Child = NULL;
-		Snake* copy = snake->MakeCopy();
+		Snake* copy = new Snake(*snake);
 		copy->changeDirection(dir);
 		copy->move();
+
 		// Find open spot for child and assign child
-		for(auto& cur : Children)
+		for (auto& cur : Children)
 		{
 			if (cur == NULL) {
 				cur = new Node(copy, dir, depth + 1);
 				Child = cur;
-				if (copy->outOfBounds() || copy->snakeCollision()) {
+				if (cur == NULL) {
+					throw(1);
+				}
+				if (copy->died()) {
 					cur->alive = false;
 					cur->snake->deleteNodes();
 					delete cur->snake;
@@ -59,7 +63,7 @@ public:
 		else return Child;
 	}
 	
-	void operator~() {
+	/*void operator~() {
 		for (auto cur : Children) {
 			if (cur) {
 				delete cur;
@@ -71,7 +75,7 @@ public:
 			delete snake;
 			snake = NULL;
 		}
-	}
+	}*/
 
 	Node* Children[3] = { NULL };
 	Snake* snake;
@@ -85,7 +89,7 @@ class PathFinderV2 : public PathFindingModel
 {
 public:
 	PathFinderV2(Snake* original, cords goal) : goal(goal) {
-		Snake* rootSnake = original->MakeCopy();
+		Snake* rootSnake = new Snake(*original);
 		root = new Node(rootSnake, rootSnake->GetDirection(), 0);
 	}
 
@@ -137,10 +141,11 @@ public:
 		if (!node)
 			return false;
 		// Checking if we are at search depth
+		if (node->cords == goal) {
+			return true;
+		}
 		if (node->depth == depth) {
-			if (node->cords == goal)
-				return true;
-			else return false;
+			return false;
 		}
 		// Growing tree for each direction
 		for (int i = 0; i < 4; ++i) {

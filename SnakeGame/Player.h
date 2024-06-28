@@ -12,5 +12,9 @@ public:
 	void ControlInterface::ChangeDirection(Direction);
 
 	void ControlInterface::endGame();
+
+private:
+	Direction queuedDirection1;
+	Direction queuedDirection2;
 };
 

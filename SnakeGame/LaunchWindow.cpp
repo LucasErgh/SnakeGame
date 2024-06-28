@@ -22,7 +22,7 @@ int LaunchWindow::LaunchSnake(int option) {
 		model = new Player(rows, columns);
 		info = new StateInfo(rows, columns, cellScale, model);
 
-		MainGameWnd = new SnakeWindow(info);
+		MainGameWnd = new SnakeWindow();
 
 		if (!MainGameWnd->Create(L"Snake", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, cellScale * rows + cellScale, cellScale * rows + cellScale + 20)) {
 			return 0;
@@ -34,7 +34,7 @@ int LaunchWindow::LaunchSnake(int option) {
 		model = new ComputerPlayer(rows, columns);
 		info = new StateInfo(rows, columns, cellScale, model);
 
-		MainGameWnd = new SnakeWindow(info);
+		MainGameWnd = new SnakeWindow();
 
 		if (!MainGameWnd->Create(L"Snake", WS_OVERLAPPEDWINDOW, 0, CW_USEDEFAULT, CW_USEDEFAULT, cellScale * rows + cellScale, cellScale * rows + cellScale + 20)) {
 			return 0;

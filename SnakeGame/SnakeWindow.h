@@ -8,6 +8,9 @@
 #include "BaseWindow.h"
 #include "DataTypes.h"
 #include "StateInfo.h"
+#include "Player.h"
+#include "ComputerPlayer.h"
+
 #include <vector> 
 #include <string>
 
@@ -26,8 +29,20 @@ class SnakeWindow : public BaseWindow<SnakeWindow>
     void    OnPaint();
     void    Resize();
 
+    void EnterGame();
+    void ExitGame();
+    void TimerUp(int num);
+
+    void ShowButtons();
+    void HideButtons();
+    HWND Start;
+    HWND OptionsBox;
+    HWND button1;
+    HWND button2;
+    HWND button3;
+
 public:
-    SnakeWindow(StateInfo* info) : pFactory(NULL), pRenderTarget(NULL), pBrush(NULL), ellipse(D2D1::Ellipse(D2D1::Point2F(), 0, 0)), info(info), rectangle(D2D1::RectF()) { };
+    SnakeWindow();
     void Update() { OnPaint(); }
 
     PCWSTR ClassName() const { return L"Snake"; }

@@ -40,7 +40,8 @@ class SearchTreeNode : public PathFindingModel
 		int cur = 0;
 		for (int i = 0; i < 4; i++) {
 			if (!IsOposite((Direction)i, dir)) {
-				Children[cur++] = new SearchTreeNode(goal, snake->MakeCopy(), (Direction)i, depth + 1);
+				/*Children[cur++] = new SearchTreeNode(goal, snake->MakeCopy(), (Direction)i, depth + 1);*/
+				Children[cur++] = new SearchTreeNode(goal, new Snake(*snake), (Direction)i, depth + 1);
 			}
 		}
 	}
@@ -93,8 +94,7 @@ public:
 			snake->changeDirection(dir);
 			if (snake->move() == goal)
 				FindGoal = true;
-			if (snake->outOfBounds() || snake->snakeCollision())
-				SnakeDied = true;
+			SnakeDied = snake->died();
 		}
 	}
 

@@ -38,7 +38,7 @@ bool ComputerPlayer::DoTurn() {
 			apple.moveApple(width, height);
 		} while (snake.isSnake(apple.getCords()));
 	}
-	if (snake.outOfBounds() || snake.snakeCollision()) {
+	if (snake.died()) {
 		gameOver = true;
 		return false;
 	}
@@ -50,5 +50,5 @@ void ComputerPlayer::ChangeDirection(Direction) {
 }
 
 void ComputerPlayer::endGame() {
-	snake.deleteNodes();
+		snake.deleteNodes();
 }

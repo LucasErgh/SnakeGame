@@ -20,15 +20,17 @@ public:
 	Snake(cords start, int width, int height);
 	// Constructor creates snake with one node at given cordinate
 
+	Snake(const Snake& snake);
+	// Copy Constructor
+
+	//Snake* MakeCopy();
+
 	cords move();
 	// This function moves the snake one unit in current direction
 	// returns the location of the snake head
 
 	bool isSnake(cords cords);
 	// given any cordinate checks if it collides with snake
-
-	bool headCollision(cords cords);
-	// returns true if given cordinates are the heads cordinates returns false otherwise
 
 	void grow(int growthAmount);
 	// Increases snake max size so snake grows
@@ -42,31 +44,23 @@ public:
 	std::vector<cords> bodyLocation();
 	// Returns list of body cords
 
-	int getSize();
-	// Returns current size of snake
-
 	void deleteNodes();
 	// Deletes all nodes
 
-	bool snakeCollision();
-
-	bool outOfBounds();
-
-	Snake* MakeCopy();
+	bool died();
 
 	Direction GetDirection();
+
+
+	int width;
+	int height;
+	int maxSize;
+	int size;
+	Direction direction;
 
 private:
 	SnakeNode *head;
 	SnakeNode *tail;
-	Direction lastDirection;
-	Direction queuedDirection1;
-	Direction queuedDirection2;
-	int size;
-	int maxSize;
-	
-	int width;
-	int height;
 };
 
 class Apple {

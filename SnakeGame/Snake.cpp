@@ -8,9 +8,7 @@ Snake::Snake() {
 	width = 10;
 	head = new SnakeNode(std::make_pair(1, 1), nullptr, nullptr);
 	tail = head;
-	lastDirection = up;
-	queuedDirection1 = none;
-	queuedDirection2 = none;
+	direction = up;
 	size = 1;
 	maxSize = size;
 }
@@ -18,46 +16,51 @@ Snake::Snake() {
 Snake::Snake(cords start, int width, int height) : width(width), height(height) {
 	head = new SnakeNode(start, nullptr, nullptr);
 	tail = head;
-	lastDirection = up;
-	queuedDirection1 = none;
-	queuedDirection2 = none;
+	direction = up;
 	size = 1;
 	maxSize = size;
 }
 
-Snake* Snake::MakeCopy() {
-	Snake* NewSnake = new Snake(this->headLocation(), width, height);
-	NewSnake->maxSize = this->maxSize;
-	NewSnake->size = this->size;
-	NewSnake->lastDirection = this->lastDirection;
-	NewSnake->queuedDirection1 = this->queuedDirection1;
-	NewSnake->queuedDirection2 = this->queuedDirection2;
+Snake::Snake(const Snake& snake) {
+	height = snake.height;
+	width = snake.width;
+	maxSize = snake.maxSize;
+	size = snake.size;
+	direction = snake.direction;
 
-	SnakeNode* cur = this->head;
-	SnakeNode* newCur = NewSnake->head;
+	SnakeNode* cur = snake.head;
+	head = new SnakeNode(cur->cordinates, NULL, NULL);
+	SnakeNode* newCur = head;
 	while (cur->back != NULL) {
 		cur = cur->back;
 		newCur->back = new SnakeNode(cur->cordinates, newCur, NULL);
+		newCur->back->front = newCur;
 		newCur = newCur->back;
 	}
-	NewSnake->tail = newCur;
-
-	return NewSnake;
+	tail = newCur;
 }
+
+//Snake* Snake::MakeCopy() {
+//	Snake* NewSnake = new Snake(this->headLocation(), width, height);
+//	NewSnake->maxSize = this->maxSize;
+//	NewSnake->size = this->size;
+//	NewSnake->direction = this->direction;
+//
+//	SnakeNode* cur = this->head;
+//	SnakeNode* newCur = NewSnake->head;
+//	while (cur->back != NULL) {
+//		cur = cur->back;
+//		newCur->back = new SnakeNode(cur->cordinates, newCur, NULL);
+//		newCur = newCur->back;
+//	}
+//	NewSnake->tail = newCur;
+//
+//	return NewSnake;
+//}
 
 cords Snake::move() {
 	// Create new had location based on current head location
 	cords newLocation(head->cordinates);
-	Direction direction;
-
-	if (queuedDirection1 == none) 
-		direction = lastDirection;
-	else {
-		direction = queuedDirection1;
-		lastDirection = queuedDirection1;
-		queuedDirection1 = queuedDirection2;
-		queuedDirection2 = none;
-	}
 
 	// Move head location by one in current direction
 	switch (direction)
@@ -116,44 +119,13 @@ bool Snake::isSnake(cords cords) {
 	}
 }
 
-bool Snake::headCollision(cords cords) {
-	if (head->cordinates == cords) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
 void Snake::grow(int growthAmount) {
 	maxSize += growthAmount;
 }
 
 void Snake::changeDirection(Direction dir) {
-	Direction* last, *next;
-	if (queuedDirection1 == none) {
-		last = &lastDirection;
-		next = &queuedDirection1;
-	}
-	else {
-		last = &queuedDirection1;
-		next = &queuedDirection2;
-	}
-	*next = dir;
-	switch (*last)
-	{
-	case up:
-		if (*next == down) *next = none;
-		break;
-	case down:
-		if (*next == up) *next = none;
-		break;
-	case left:
-		if (*next == right) *next = none;
-		break;
-	case right:
-		if (*next == left) *next = none;
-		break;
+	if (!IsOposite(dir, direction)) {
+		direction = dir;
 	}
 }
 
@@ -171,10 +143,6 @@ std::vector<cords> Snake::bodyLocation() {
 	return body;
 }
 
-int Snake::getSize() {
-	return size;
-}
-
 void Snake::deleteNodes() {
 	SnakeNode* cur = tail;
 	while (cur->front != nullptr) {
@@ -184,21 +152,19 @@ void Snake::deleteNodes() {
 	delete cur;
 }
 
-bool Snake::snakeCollision() {
+Direction Snake::GetDirection() { return this->direction; }
+
+bool Snake::died() {
+	cords headCords = headLocation();
+	if (headCords.first <= 0 || headCords.second <= 0 || headCords.first > width || headCords.second > height)
+		return true;
+
 	std::vector<cords> body = bodyLocation();
 	for (auto cur : body) {
 		if (head->cordinates == cur)
 			return true;
 	}
-	return false;
-}
 
-Direction Snake::GetDirection() { return this->lastDirection; }
-
-bool Snake::outOfBounds() {
-	cords headCords = headLocation();
-	if (headCords.first <= 0 || headCords.second <= 0 || headCords.first > width || headCords.second > height)
-		return true;
 	return false;
 }
 
