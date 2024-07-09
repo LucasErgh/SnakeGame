@@ -5,6 +5,7 @@
 #include "ControlInterface.h"
 #include "SearchTreeNode.h"
 #include "PathFinderV2.h"
+#include "PathFinderV4.h"
 
 class ComputerPlayer : public ControlInterface
 {

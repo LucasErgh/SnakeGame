@@ -19,7 +19,7 @@ bool ComputerPlayer::DoTurn() {
 		directions = NULL;
 	}
 	if (directions == NULL) {
-		PathFindingModel* model = new PathFinderV2(&snake, apple.getCords());
+		PathFindingModel* model = new PathFinderV4(&snake);
 		directions = model->FindPath();
 		model->Delete();
 		delete model;
