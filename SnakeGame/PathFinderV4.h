@@ -68,28 +68,31 @@ private:
 		// y-cordinate by 1 if its horizontal segment is oriented right.
 		// We must also rotate it clockwise before we shift segments.
 
-		int** minDialated;
+		// allocate memory for the dilated cycle
+		int** minDilated;
 		int length = width;
-		minDialated = new int* [length];
-		for (int i = 0; i < length; ++length) {
-			minDialated[i] = new int[length];
+		minDilated = new int* [length];
+		for (int i = 0; i < length; ++i) {
+			minDilated[i] = new int[length];
+			for (int j = 0; j < length; ++j) {
+				minDilated[i][j] = -1; // initialize to -1 for debugging
+			}
 		}
 
-		Direction enter;
-		Direction exit;
-		int Ox1, Oy1, Ox2, Oy2, Nx1, Ny1, Nx2, Ny2;
-		int cur, number = 0;
+		// Variables to keep track of current position and direction
+		Direction enter, exit;
+		int Ox1 = 0, Oy1 = 0, Ox2 = 0, Oy2 = 0;
+		int Nx1, Ny1, Nx2, Ny2;
+		int number = 0;
 		bool running = true;
+		int val = 0;
+		int startx, starty;
 
 		// Find starting point
-		if (minimum[0][0] == 0) {
-			Ox1 = 0;
-			Oy1 = 0;
-		}
-		else {
+		if (minimum[0][0] != 0) {
 			for (int j = 0; j < minLength; ++j) {
 				for (int k = 0; k < minLength; ++k) {
-					if (minimum[j][k] == 0) {
+					if (minimum[j][k] == val) {
 						Oy1 = j;
 						Ox1 = k;
 						break;
@@ -98,18 +101,11 @@ private:
 			}
 		}
 
-		// Place nodes on scaled version
-		// Find previous direction
-		cur = minimum[Oy1][Ox1];
-		
-		int previous;
-		if (cur == 0) previous = minLength * minLength;
-		else previous = --cur;
-
-		if (minimum[Oy1 + 1][Ox1] == previous) enter = down;
-		else if (minimum[Oy1][Ox1 + 1] == previous) enter = right;
-		else if (minimum[Oy1 - 1][Ox1] == previous) enter = up;
-		else if (minimum[Oy1][Ox1 - 1] == previous) enter = left;
+		// Find starting point
+		if (Oy1 != minLength - 1 && minimum[Oy1 + 1][Ox1] == minLength * minLength - 1) enter = up;
+		else if (Ox1 != minLength - 1 && minimum[Oy1][Ox1 + 1] == minLength * minLength - 1) enter = left;
+		else if (Oy1 != 0 && minimum[Oy1 - 1][Ox1] == minLength * minLength - 1) enter = down;
+		else if (Ox1 != 0 && minimum[Oy1][Ox1 - 1] == minLength * minLength - 1) enter = left;
 		else throw(1);
 
 		Ox2 = Ox1;
@@ -118,74 +114,94 @@ private:
 		while (running) {
 			// Loop to find the next turn
 			do {
-				int next;
-				if (cur == minLength * minLength - 1) {
-					next = 0;
-				}
-				else {
-					next = cur + 1;
-				}
+				int next = (val >= minLength * minLength - 1) ? val - (minLength * minLength - 1)  : val + 1;
 
-				if (minimum[Oy2 + 1][Ox2] == next) 
-				{ 
-					exit = down; 
+				if (Oy2 < minLength - 1 && minimum[Oy2 + 1][Ox2] == next) {
+					exit = down;
 					Oy2 += 1;
 				}
-				else if (minimum[Oy2][Ox2 + 1] == next)
-				{
+				else if (Ox2 < minLength - 1 && minimum[Oy2][Ox2 + 1] == next) {
 					exit = right;
 					Ox2 += 1;
 				}
-				else if (minimum[Oy2 - 1][Ox2] == next)
-				{
+				else if (Oy2 > 0 && minimum[Oy2 - 1][Ox2] == next) {
 					exit = up;
 					Oy2 -= 1;
 				}
-				else if (minimum[Oy2][Ox2 - 1] == next)
-				{
+				else if (Ox2 > 0 && minimum[Oy2][Ox2 - 1] == next) {
 					exit = left;
 					Ox2 -= 1;
 				}
-				else throw(1);
-				++cur;
-
-			} while (enter != exit);
-
-			switch (exit)
-			{
-			case up:
-				while (Ox1 != Ox2 && Oy1 != Oy2 + 1) {
-
+				else {
+					throw(1);
 				}
-				break;
-			case down:
-				break;
-			case left:
-				break;
-			case right:
-				break;
-			case none:
-				break;
-			default:
-				break;
+				++val;
+
+			} while (enter == exit);
+
+			Nx2 = Ox2;
+			Ny2 = Oy2;
+
+			// undo last move
+			switch (exit) {
+				case up: ++Ny2; break;
+				case down: --Ny2; break;
+				case left: ++Nx2; break;
+				case right: --Nx2; break;
+				default: throw(1); break;
 			}
 
-			int newx = Ox2 * 2 + 1, newy = Oy2 * 2 + 1;
+			// scale old points to new points
+			Nx2 = Nx2 * 2 + 1;
+			Ny2 = Ny2 * 2 + 1;
 
-			if (enter == right || exit == right) {
-				// if we went right in a turn we need to go up
-				newy -= 1;
+			// shift points if they traveled right or down
+			if (enter == right || exit == right) --Ny2;
+			if (exit == down || enter == down) --Nx2;
+			
+			if (number == 0) {
+				Ny1 = Ny2;
+				Nx1 = Nx2;
+				startx = Nx1;
+				starty = Ny1;
+
+				minDilated[Ny1][Nx1] = number++;
 			}
-			if (enter == down || exit == down) {
-				// if we went down in a turn we need to go left
-				newx -= 1;
+
+			// fill in points between corners
+			while ((Nx1 != Nx2 || Ny1 != Ny2) && (number > 2 || (Nx1 != startx && Ny1 != starty))) {
+				switch (enter) {
+					case up: --Ny1; break;
+					case down: ++Ny1; break;
+					case left: --Nx1; break;
+					case right: ++Nx1; break;
+					default: throw(1);  break;
+				}			
+				
+				minDilated[Ny1][Nx1] = number++;
+			} 
+
+			// R
+			Ox1 = Ox2;
+			Oy1 = Oy2;
+			Ny1 = Ny2;
+			Nx1 = Nx2;
+			enter = exit;
+
+			// Check if we have completed the cycle
+			if (minDilated[Ny1][Nx1] == 0 && number > 2) {
+				minDilated[Ny1][Nx1] = number ;
+				break;
 			}
-
-
-
-			// check if anything is out of bounds
-			if (Oy2 < 0 || Ox2 < 0) throw (0);
 		}
+
+		// Cleam memory
+		for (int i = 0; i < minLength; ++i) {
+			delete[] minimum[i];
+		}
+		delete[] minimum;
+
+		return minDilated;
 	}
 };
 
