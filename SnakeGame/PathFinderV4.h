@@ -78,7 +78,7 @@ private:
 		}
 
 		// Variables to keep track of current position and direction
-		Direction enter, exit;
+		Direction enter, exit = none;
 		int Ox1 = 0, Oy1 = 0, Ox2 = 0, Oy2 = 0;
 		int Nx1, Ny1, Nx2, Ny2;
 		int number = 0;
@@ -114,6 +114,10 @@ private:
 			do {
 				int next = (val >= minLength * minLength - 1) ? val - (minLength * minLength - 1)  : val + 1;
 
+				if (!GetDirection(minimum, Oy2, Ox2, enter, exit, minLength, minLength, minLength * minLength - 1)) {
+					throw(1); // If enterance isn't correct throw
+				}
+				/* Old Version Without Helper
 				if (Oy2 < minLength - 1 && minimum[Oy2 + 1][Ox2] == next) {
 					exit = down;
 					Oy2 += 1;
@@ -133,8 +137,12 @@ private:
 				else {
 					throw(1);
 				}
-				++val;
+				*/
 
+				++val;
+				if (exit == none) {
+					throw(1);
+				}
 			} while (enter == exit);
 
 			Nx2 = Ox2;
@@ -181,12 +189,13 @@ private:
 				minDilated[Ny1][Nx1] = number++;
 			} 
 
-			// R
+			// Reset variables
 			Ox1 = Ox2;
 			Oy1 = Oy2;
 			Ny1 = Ny2;
 			Nx1 = Nx2;
 			enter = exit;
+			exit = none;
 
 			// Check if we have completed the cycle
 			if (number > 2 && Ny2 == starty && Nx2 == startx) {
@@ -205,6 +214,104 @@ private:
 		we now start making the maximum turns version by creating a grid of closed
 		loops. Then we find the reduced form, which has maximum number of turns.
 		*/
+
+		// Initialize both new grids we will need
+		int** SquareCycles = new int*[height];
+		int** ReducedGrid = new int* [height];
+
+		for (int i = 0; i < height; ++i) {
+			SquareCycles[i] = new int[width];
+			ReducedGrid[i] = new int[width];
+			for (int j = 0; j < width; ++j) {
+				// initialize each cell in new grids to -1
+				SquareCycles[i][j] = -1;
+				ReducedGrid[i][j] = -1;
+			}
+		}
+
+		// Fill SquareCycles Grid
+		number = 0; // reusing the varible I used for this before
+		for (int j = 0; j < height; j + 2) {
+			for (int k = 0; k < width; k + 2) {
+				SquareCycles[j][k] = number++;
+				SquareCycles[j][k + 1] = number++;
+				SquareCycles[j + 1][k + 1] = number++;
+				SquareCycles[j + 1][k] = number++;
+			}
+		}
+
+		// Find union of SquareCycles Grid and minDialated then put it in ReducedGrid
+		Direction SquareEnter, SquareExit, DialatedEnter, DialatedExit, UnionEnter, UnionExit;
+		int x1, x2 = 0, y1, y2 = 0;
+		cur = 0;
+
+		// Find next cells 
+		for (cur = 0; cur < height * width; ++cur) {
+			if (cur == height * width - 1) {
+				cur = 0;
+			}
+			// Find next cell SquareCycles
+			for (int j = 0; j < height; ++j) {
+				for (int k = 0; k < width; ++k) {
+					if (SquareCycles[j][k] == cur) {
+						x1 = k;
+						y1 = j;
+					}
+				}
+			}
+			// Find next cell minDialted
+			if (minDilated[y2][x2] != cur) {
+				if (DialatedExit == none || minDilated[y2][x2] == -1) {
+					for (int j = 0; j < height; ++j) {
+						for (int k = 0; k < width; ++k) {
+							if (minDilated[j][k] == cur) {
+								x2 = k;
+								y2 = j;
+								j = height;
+								k = width;
+							}
+						}
+					}
+				}
+				else {
+					switch (DialatedExit){
+						case up: --y2; break;
+						case down: ++y2; break;
+						case left: --x2; break;
+						case right: ++x2; break;
+						default: throw (1);
+					}
+				}
+				GetDirection(minDilated, )
+			}
+		}
+
+	}
+
+// Given the grid "grid" has dimentions (height, width) this will find the 
+// preceeding and next cells and store them in the variables dir1 for the 
+// previous direction, and dir2 for the next direciton. If dir2 or dir2 are
+// the return will represent if they are accurate
+	bool GetDirection(int** grid, int y, int x, Direction& dir1, Direction& dir2, int height, int width, int max = 0) {
+		Direction given1 = dir1, given2 = dir2;
+
+		int x2, y2;
+		int next = (grid[y][x] == max) ? 0 : grid[y][x] + 1;
+		int previous = (grid[y][x] == 0) ? max : grid[y][x] - 1;
+
+		if (y < height - 1 && grid[y + 1][x] == next) dir2 = down;
+		else if (x > 0 && grid[y][x - 1] == next) dir2 = left;
+		else if (y > 0 && grid[y - 1][x] == next) dir2 = up;
+		else if (x < width - 1 && grid[y][x + 1] == next) dir2 = right;
+
+		if (y < height - 1 && grid[y + 1][x] == previous) dir1 = up;
+		else if (x > 0 && grid[y][x - 1] == previous) dir1 = right;
+		else if (y > 0 && grid[y - 1][x] == previous) dir1 = down;
+		else if (x < width - 1 && grid[y][x + 1] == previous) dir1 = left;
+	
+		if (given1 != none && given1 != dir1) return false;
+		else if (given2 != none && given2 != dir2) return false;
+		else return true;
 	}
 };
 
