@@ -33,12 +33,10 @@ private:
 		if (width != height || width % 2 != 0) {
 			throw(1);
 		}
-
 		
 		// The method I'm using for creating the cycles was taken from 
 		// a paper called "Turns in Hamilton cycles of rectangular grids" 
 		// written by Ethan Y. Tan and Guowen Zhang
-		
 
 		// We start by making a cycle with minimum number of turns for a grid of half its length and width
 		int minLength = width / 2;
@@ -164,12 +162,13 @@ private:
 				Nx1 = Nx2;
 				startx = Nx1;
 				starty = Ny1;
-
+				// this will set the both corners to the same value skiping the next loop
 				minDilated[Ny1][Nx1] = number++;
 			}
 
 			// fill in points between corners
-			while ((Nx1 != Nx2 || Ny1 != Ny2) && (number > 2 || (Nx1 != startx && Ny1 != starty))) {
+			while ((Nx1 != Nx2 || Ny1 != Ny2)) {
+
 				switch (enter) {
 					case up: --Ny1; break;
 					case down: ++Ny1; break;
@@ -177,7 +176,8 @@ private:
 					case right: ++Nx1; break;
 					default: throw(1);  break;
 				}			
-				
+				if (Nx1 == startx && Ny1 == starty)
+					break;
 				minDilated[Ny1][Nx1] = number++;
 			} 
 
@@ -189,8 +189,7 @@ private:
 			enter = exit;
 
 			// Check if we have completed the cycle
-			if (minDilated[Ny1][Nx1] == 0 && number > 2) {
-				minDilated[Ny1][Nx1] = number ;
+			if (number > 2 && Ny2 == starty && Nx2 == startx) {
 				break;
 			}
 		}
@@ -201,7 +200,11 @@ private:
 		}
 		delete[] minimum;
 
-		return minDilated;
+		/* 
+		Now that we have the scaled minimum turns of half the side length grid
+		we now start making the maximum turns version by creating a grid of closed
+		loops. Then we find the reduced form, which has maximum number of turns.
+		*/
 	}
 };
 
