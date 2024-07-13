@@ -68,6 +68,7 @@ private:
 
 		// allocate memory for the dilated cycle
 		int** minDilated;
+		int DilatedMax;
 		int length = width;
 		minDilated = new int* [length];
 		for (int i = 0; i < length; ++i) {
@@ -117,6 +118,16 @@ private:
 				if (!GetDirection(minimum, Oy2, Ox2, enter, exit, minLength, minLength, minLength * minLength - 1)) {
 					throw(1); // If enterance isn't correct throw
 				}
+
+				// move to the next cell to check for turn
+				switch (exit) {
+					case up: --Oy2; break;
+					case down: ++Oy2; break;
+					case left: --Ox2; break;
+					case right: ++Ox2; break;
+					default: throw(1); break;
+				}
+
 				/* Old Version Without Helper
 				if (Oy2 < minLength - 1 && minimum[Oy2 + 1][Ox2] == next) {
 					exit = down;
@@ -199,6 +210,7 @@ private:
 
 			// Check if we have completed the cycle
 			if (number > 2 && Ny2 == starty && Nx2 == startx) {
+				DilatedMax = number - 1;
 				break;
 			}
 		}
@@ -230,9 +242,9 @@ private:
 		}
 
 		// Fill SquareCycles Grid
-		number = 0; // reusing the varible I used for this before
-		for (int j = 0; j < height; j + 2) {
-			for (int k = 0; k < width; k + 2) {
+		number = 0;
+		for (int j = 0; j < height; j += 2) {
+			for (int k = 0; k < width; k += 2) {
 				SquareCycles[j][k] = number++;
 				SquareCycles[j][k + 1] = number++;
 				SquareCycles[j + 1][k + 1] = number++;
@@ -240,78 +252,175 @@ private:
 			}
 		}
 
-		// Find union of SquareCycles Grid and minDialated then put it in ReducedGrid
-		Direction SquareEnter, SquareExit, DialatedEnter, DialatedExit, UnionEnter, UnionExit;
-		int x1, x2 = 0, y1, y2 = 0;
-		cur = 0;
+		// Find the union of SquareCycles Grid and minDialated then put it in ReducedGrid
+		// (I beleive its actually not the union, but rather, the difference of their union and their intersection but Ill be saying union)
+		Direction SquareEnter = none, SquareExit = none, DialatedEnter = none, DialatedExit = none, UnionEnter = up, UnionExit = none;
+		int y1 = 0, x1 = 0, // these keep track of our position in the ReducedGrid
+			y2 = 0, x2 = 0; // these keep track of the next turn in the ReducedGrid
+		int curUnion = 0;
+
 
 		// Find next cells 
-		for (cur = 0; cur < height * width; ++cur) {
-			if (cur == height * width - 1) {
-				cur = 0;
+		while(curUnion < height * width) {
+			if (curUnion == height * width) {
+				throw(1);
 			}
-			// Find next cell SquareCycles
-			for (int j = 0; j < height; ++j) {
-				for (int k = 0; k < width; ++k) {
-					if (SquareCycles[j][k] == cur) {
-						x1 = k;
-						y1 = j;
-					}
+			
+			// This loop find the next turn
+			do {
+				// We need to find the min and max of the small cycle to get the direction in the SquareGrid
+				int tempx, tempy;
+				if (x2 % 2 == 0) tempx = x2;
+				else tempx = x2 - 1;
+				if (y2 % 2 == 0) tempy = y2;
+				else tempy = y2 - 1;
+				GetDirection(SquareCycles, y2, x2, SquareEnter, SquareExit, height, width, SquareCycles[tempy + 1][tempx], SquareCycles[tempy][tempx]);
+				
+				// switch direction of enterances
+				Direction OpositeEnter;
+				switch (UnionEnter) {
+					case up: OpositeEnter = down; break;
+					case down: OpositeEnter = up; break;
+					case left: OpositeEnter = right; break;
+					case right: OpositeEnter = left; break;
 				}
-			}
-			// Find next cell minDialted
-			if (minDilated[y2][x2] != cur) {
-				if (DialatedExit == none || minDilated[y2][x2] == -1) {
-					for (int j = 0; j < height; ++j) {
-						for (int k = 0; k < width; ++k) {
-							if (minDilated[j][k] == cur) {
-								x2 = k;
-								y2 = j;
-								j = height;
-								k = width;
-							}
-						}
-					}
+				switch (SquareEnter) {
+					case up: SquareEnter = down; break;
+					case down: SquareEnter = up; break;
+					case left: SquareEnter = right; break;
+					case right: SquareEnter = left; break;
 				}
-				else {
-					switch (DialatedExit){
-						case up: --y2; break;
-						case down: ++y2; break;
-						case left: --x2; break;
-						case right: ++x2; break;
-						default: throw (1);
-					}
-				}
-				GetDirection(minDilated, )
-			}
-		}
 
+				// if the dialated grid isn't filled in here we just go with the square grid
+				if (minDilated[y2][x2] == -1) {
+					if (OpositeEnter != SquareExit)
+						UnionExit = SquareExit;
+					else
+						UnionExit = SquareEnter;
+				}
+				// otherwise we have to find the union
+				else {
+					// now find the direction of the current cel in minDialated and SquareCycles
+					if (!GetDirection(minDilated, y2, x2, DialatedEnter, DialatedExit, height, width, DilatedMax)) {
+						throw(1);
+					}
+
+					// swap the enterances because those are in the oposite direction
+					switch (DialatedEnter) {
+						case up: DialatedEnter = down; break;
+						case down: DialatedEnter = up; break;
+						case left: DialatedEnter = right; break;
+						case right: DialatedEnter = left; break;
+					}
+					
+					// Now we find the correct direction
+					if (DialatedEnter != none && DialatedEnter != SquareEnter && DialatedEnter != SquareExit && DialatedEnter != OpositeEnter) {
+						UnionExit = DialatedEnter;
+					}
+					else if (DialatedExit != none && DialatedExit != SquareEnter && DialatedExit != SquareExit && DialatedExit != OpositeEnter) {
+						UnionExit = DialatedExit;
+					}
+					else if (SquareEnter != none && SquareEnter != DialatedEnter && SquareEnter != DialatedExit && SquareEnter != OpositeEnter) {
+						UnionExit = SquareEnter;
+					}
+					else if (SquareExit != none && SquareExit != DialatedEnter && SquareExit != DialatedExit && SquareExit != OpositeEnter) {
+						UnionExit = SquareExit;
+					}
+					else throw(1);
+				}
+
+				// move to next cell to check for turn
+				switch (UnionExit) {
+					case up: --y2; break;
+					case down: ++y2; break;
+					case left: --x2; break;
+					case right: ++x2; break;
+					default: throw(1); break;
+				}
+
+			} while (UnionEnter == UnionExit);			
+			
+			int BSy = y2, BSx = x2; // positions before they were shifted back
+
+			// undo last move
+			switch (UnionExit) {
+				case up: ++y2; break;
+				case down: --y2; break;
+				case left: ++x2; break;
+				case right: --x2; break;
+				default: throw(1); break;
+			}
+
+			// Mark points in ReducedGrid
+			if (curUnion == 0) {
+				// this will set the both corners to the same value skiping the next loop
+				ReducedGrid[y1][x1] = curUnion++;
+				x1 = x2;
+				y1 = y2;
+			}
+			else {
+				// fill in points between corners
+				while ((x1 != x2 || y1 != y2)) {
+					if (x1 == 0 && y1 == 0)
+						break;
+					ReducedGrid[y1][x1] = curUnion++;
+					switch (UnionEnter) {
+					case up: --y1; break;
+					case down: ++y1; break;
+					case left: --x1; break;
+					case right: ++x1; break;
+					default: throw(1);  break;
+					}
+				}
+				// fill corner
+				if (x1 == 0 && y1 == 0)
+					break;
+				ReducedGrid[y2][x2] = curUnion++;
+			}
+
+			// set starting points to new corner
+			x2 = BSx;
+			y2 = BSy;
+			x1 = x2;
+			y1 = y2;
+			UnionEnter = UnionExit;
+			UnionExit = none;
+		}
+		for (int i = 0; i < height; ++i) {
+			delete[] SquareCycles[width];
+			delete[] minDilated[width];
+		}
+		delete[] minDilated;
+		delete[] SquareCycles;
+		return ReducedGrid;
 	}
 
 // Given the grid "grid" has dimentions (height, width) this will find the 
 // preceeding and next cells and store them in the variables dir1 for the 
 // previous direction, and dir2 for the next direciton. If dir2 or dir2 are
 // the return will represent if they are accurate
-	bool GetDirection(int** grid, int y, int x, Direction& dir1, Direction& dir2, int height, int width, int max = 0) {
+
+// This also assumes that the node is not empty (grid[y][x] != -1)
+	bool GetDirection(int** grid, int y, int x, Direction& dir1, Direction& dir2, int height, int width, int max, int min = 0) {
 		Direction given1 = dir1, given2 = dir2;
 
 		int x2, y2;
-		int next = (grid[y][x] == max) ? 0 : grid[y][x] + 1;
-		int previous = (grid[y][x] == 0) ? max : grid[y][x] - 1;
+		int next = (grid[y][x] == max) ? min : grid[y][x] + 1;
+		int previous = (grid[y][x] == min) ? max : grid[y][x] - 1;
 
 		if (y < height - 1 && grid[y + 1][x] == next) dir2 = down;
 		else if (x > 0 && grid[y][x - 1] == next) dir2 = left;
 		else if (y > 0 && grid[y - 1][x] == next) dir2 = up;
 		else if (x < width - 1 && grid[y][x + 1] == next) dir2 = right;
+		else return false;
 
 		if (y < height - 1 && grid[y + 1][x] == previous) dir1 = up;
 		else if (x > 0 && grid[y][x - 1] == previous) dir1 = right;
 		else if (y > 0 && grid[y - 1][x] == previous) dir1 = down;
 		else if (x < width - 1 && grid[y][x + 1] == previous) dir1 = left;
+		else return false;
 	
-		if (given1 != none && given1 != dir1) return false;
-		else if (given2 != none && given2 != dir2) return false;
-		else return true;
+		return true;
 	}
 };
 
