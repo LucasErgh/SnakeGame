@@ -27,28 +27,23 @@ public:
 		cords cell = snake->headLocation();
 		--cell.first;
 		--cell.second;
-		Direction last;
+		Direction last = snake->direction;
 		Direction dir;
 
 		apple = cords(goal.first - 1, goal.second - 1);
-		bool foundApple = false;
 
-		while (!foundApple)
+		while (true)
 		{
-			GetDirection(cycle, cell.second, cell.first, last, dir, height, width, max);
-			/*if (IsOposite(dir, snake->direction)) {
-				directions->insert(directions->begin(), snake->direction);
-				Shift(snake->direction, cell.second, cell.first);
-				continue;
-			}*/
+			if (cell == apple) return directions;
+
+			GetDirection(cycle, cell.second, cell.first, NULL, &dir, height, width, max);
+			if (IsOposite(dir, last)) {
+				dir = snake->direction;
+			}
 			Shift(dir, cell.second, cell.first);
 			directions->insert(directions->begin(), dir);
-			if (cell == apple) {
-				return directions;
-			}
+			last = dir;
 		}
-
-		return directions;
 	}
 
 	void PathFindingModel::Delete() {
@@ -148,36 +143,14 @@ private:
 		while (running) {
 			// Loop to find the next turn
 			do {
-				int next = (val >= minLength * minLength - 1) ? val - (minLength * minLength - 1)  : val + 1;
+				int next = (val >= minLength * minLength - 1) ? val - (minLength * minLength - 1) : val + 1;
 
-				if (!GetDirection(minimum, Oy2, Ox2, enter, exit, minLength, minLength, minLength * minLength - 1)) {
+				if (!GetDirection(minimum, Oy2, Ox2, &enter, &exit, minLength, minLength, minLength * minLength - 1)) {
 					throw(1); // If enterance isn't correct throw
 				}
 
 				// move to the next cell to check for turn
 				Shift(exit, Oy2, Ox2);
-
-				/* Old Version Without Helper
-				if (Oy2 < minLength - 1 && minimum[Oy2 + 1][Ox2] == next) {
-					exit = down;
-					Oy2 += 1;
-				}
-				else if (Ox2 < minLength - 1 && minimum[Oy2][Ox2 + 1] == next) {
-					exit = right;
-					Ox2 += 1;
-				}
-				else if (Oy2 > 0 && minimum[Oy2 - 1][Ox2] == next) {
-					exit = up;
-					Oy2 -= 1;
-				}
-				else if (Ox2 > 0 && minimum[Oy2][Ox2 - 1] == next) {
-					exit = left;
-					Ox2 -= 1;
-				}
-				else {
-					throw(1);
-				}
-				*/
 
 				++val;
 				if (exit == none) {
@@ -294,7 +267,7 @@ private:
 				if (y2 % 2 == 0) tempy = y2;
 				else			 tempy = y2 - 1;
 				
-				GetDirection(SquareCycles, y2, x2, SquareEnter, SquareExit, height, width, SquareCycles[tempy + 1][tempx], SquareCycles[tempy][tempx]);
+				GetDirection(SquareCycles, y2, x2, &SquareEnter, &SquareExit, height, width, SquareCycles[tempy + 1][tempx], SquareCycles[tempy][tempx]);
 				
 				// switch direction of enterances
 				Direction OpositeEnter = Oposite(UnionEnter);
@@ -310,7 +283,7 @@ private:
 				// otherwise we have to find the union
 				else {
 					// now find the direction of the current cel in minDialated and SquareCycles
-					if (!GetDirection(minDilated, y2, x2, DialatedEnter, DialatedExit, height, width, DilatedMax)) {
+					if (!GetDirection(minDilated, y2, x2, &DialatedEnter, &DialatedExit, height, width, DilatedMax)) {
 						throw(1);
 					}
 
@@ -386,23 +359,24 @@ private:
 	// previous direction, and dir2 for the next direciton. If dir2 or dir2 are
 	// the return will represent if they are accurate
 	// This also assumes that the node is not empty (grid[y][x] != -1)
-	bool GetDirection(int** grid, int y, int x, Direction& dir1, Direction& dir2, int height, int width, int max, int min = 0) {
-		int x2, y2;
-		int next = (grid[y][x] == max) ? min : grid[y][x] + 1;
-		int previous = (grid[y][x] == min) ? max : grid[y][x] - 1;
+	bool GetDirection(int** grid, int y, int x, Direction *dir1, Direction *dir2, int height, int width, int max, int min = 0) {
+		int num = (grid[y][x] == max) ? min : grid[y][x] + 1;
 
-		if (y < height - 1 && grid[y + 1][x] == next) dir2 = down;
-		else if (x > 0 && grid[y][x - 1] == next) dir2 = left;
-		else if (y > 0 && grid[y - 1][x] == next) dir2 = up;
-		else if (x < width - 1 && grid[y][x + 1] == next) dir2 = right;
+		if (y < height - 1 && grid[y + 1][x] == num) *dir2 = down;
+		else if (x > 0 && grid[y][x - 1] == num) *dir2 = left;
+		else if (y > 0 && grid[y - 1][x] == num) *dir2 = up;
+		else if (x < width - 1 && grid[y][x + 1] == num) *dir2 = right;
 		else return false;
 
-		if (y < height - 1 && grid[y + 1][x] == previous) dir1 = up;
-		else if (x > 0 && grid[y][x - 1] == previous) dir1 = right;
-		else if (y > 0 && grid[y - 1][x] == previous) dir1 = down;
-		else if (x < width - 1 && grid[y][x + 1] == previous) dir1 = left;
-		else return false;
-	
+		if (dir1) {
+			num = (grid[y][x] == min) ? max : grid[y][x] - 1;
+			if (y < height - 1 && grid[y + 1][x] == num) *dir1 = up;
+			else if (x > 0 && grid[y][x - 1] == num) *dir1 = right;
+			else if (y > 0 && grid[y - 1][x] == num) *dir1 = down;
+			else if (x < width - 1 && grid[y][x + 1] == num) *dir1 = left;
+			else return false;
+		}
+
 		return true;
 	}
 

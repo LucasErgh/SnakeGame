@@ -23,14 +23,14 @@ bool ComputerPlayer::DoTurn() {
 	if (directions == NULL) {
 		directions = path->FindPath(apple.getCords());
 	}
-	if (directions != NULL) {
+	if (directions != NULL && directions->size() > 0) {
 		Direction direction = directions->back();
 		directions->pop_back();
 		snake.changeDirection(direction);
 	}
 
+	// Move then check for success
 	snake.move();
-
 	if (snake.headLocation() == apple.getCords() && snake.size < height * width) {
 		snake.grow(growthRate);
 		do {
