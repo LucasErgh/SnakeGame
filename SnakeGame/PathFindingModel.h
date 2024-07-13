@@ -6,7 +6,7 @@
 class PathFindingModel
 {
 public:
-	virtual std::vector<Direction>* FindPath() = 0;
+	virtual std::vector<Direction>* FindPath(cords) = 0;
 	virtual void Delete() = 0;
 };
 

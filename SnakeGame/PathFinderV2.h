@@ -93,7 +93,7 @@ public:
 		root = new Node(rootSnake, rootSnake->GetDirection(), 0);
 	}
 
-	std::vector<Direction>* PathFindingModel::FindPath() {
+	std::vector<Direction>* PathFindingModel::FindPath(cords goal) {
 		bool running = true;
 		int searchDepth = 0; 
 		int lastDeepestNode = 0;

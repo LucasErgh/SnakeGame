@@ -11,23 +11,58 @@ able to choose any size game board with this method.
 class PathFinderV4 : public PathFindingModel
 {
 public:
-	int width, height;
+	int width, height, max;
 	int** cycle; // dynamic array to store cycle (each cell will represent the order in the cycle of that cell)
+	Snake* snake;
+	cords apple;
 
-	PathFinderV4(Snake* snake) : width(snake->width), height(snake->height) {
+	PathFinderV4(Snake* snake) : snake(snake), width(snake->width), height(snake->height) {
+		max = width * height - 1;
 		cycle = GenerateCycle(width, height);
 	}
 
-	std::vector<Direction>* PathFindingModel::FindPath() {
-		return NULL;
+	std::vector<Direction>* PathFindingModel::FindPath(cords goal) {
+		std::vector<Direction>* directions = new std::vector<Direction>;
+
+		cords cell = snake->headLocation();
+		--cell.first;
+		--cell.second;
+		Direction last;
+		Direction dir;
+
+		apple = cords(goal.first - 1, goal.second - 1);
+		bool foundApple = false;
+
+		while (!foundApple)
+		{
+			GetDirection(cycle, cell.second, cell.first, last, dir, height, width, max);
+			/*if (IsOposite(dir, snake->direction)) {
+				directions->insert(directions->begin(), snake->direction);
+				Shift(snake->direction, cell.second, cell.first);
+				continue;
+			}*/
+			Shift(dir, cell.second, cell.first);
+			directions->insert(directions->begin(), dir);
+			if (cell == apple) {
+				return directions;
+			}
+		}
+
+		return directions;
 	}
 
 	void PathFindingModel::Delete() {
-
+		for (int i = 0; i < height; ++i) {
+			delete[] cycle[i];
+		}
+		delete[] cycle;
 	}
 
 
 private:
+	// This generates a hamilton cycle with maximum turns of given size
+	// With the requirnment that width and height are divisible by four
+	// and width and height are the same value
 	int** GenerateCycle(int width, int height) {
 		// At the moment this only works for square grids with side lengths divisible by four
 		if (width != height || width % 2 != 0) {
@@ -120,13 +155,7 @@ private:
 				}
 
 				// move to the next cell to check for turn
-				switch (exit) {
-					case up: --Oy2; break;
-					case down: ++Oy2; break;
-					case left: --Ox2; break;
-					case right: ++Ox2; break;
-					default: throw(1); break;
-				}
+				Shift(exit, Oy2, Ox2);
 
 				/* Old Version Without Helper
 				if (Oy2 < minLength - 1 && minimum[Oy2 + 1][Ox2] == next) {
@@ -160,13 +189,7 @@ private:
 			Ny2 = Oy2;
 
 			// undo last move
-			switch (exit) {
-				case up: ++Ny2; break;
-				case down: --Ny2; break;
-				case left: ++Nx2; break;
-				case right: --Nx2; break;
-				default: throw(1); break;
-			}
+			Shift(Oposite(exit), Ny2, Nx2);
 
 			// scale old points to new points
 			Nx2 = Nx2 * 2 + 1;
@@ -188,13 +211,7 @@ private:
 			// fill in points between corners
 			while ((Nx1 != Nx2 || Ny1 != Ny2)) {
 
-				switch (enter) {
-					case up: --Ny1; break;
-					case down: ++Ny1; break;
-					case left: --Nx1; break;
-					case right: ++Nx1; break;
-					default: throw(1);  break;
-				}			
+				Shift(enter, Ny1, Nx1);
 				if (Nx1 == startx && Ny1 == starty)
 					break;
 				minDilated[Ny1][Nx1] = number++;
@@ -270,26 +287,18 @@ private:
 			do {
 				// We need to find the min and max of the small cycle to get the direction in the SquareGrid
 				int tempx, tempy;
+
 				if (x2 % 2 == 0) tempx = x2;
-				else tempx = x2 - 1;
+				else			 tempx = x2 - 1;
+				
 				if (y2 % 2 == 0) tempy = y2;
-				else tempy = y2 - 1;
+				else			 tempy = y2 - 1;
+				
 				GetDirection(SquareCycles, y2, x2, SquareEnter, SquareExit, height, width, SquareCycles[tempy + 1][tempx], SquareCycles[tempy][tempx]);
 				
 				// switch direction of enterances
-				Direction OpositeEnter;
-				switch (UnionEnter) {
-					case up: OpositeEnter = down; break;
-					case down: OpositeEnter = up; break;
-					case left: OpositeEnter = right; break;
-					case right: OpositeEnter = left; break;
-				}
-				switch (SquareEnter) {
-					case up: SquareEnter = down; break;
-					case down: SquareEnter = up; break;
-					case left: SquareEnter = right; break;
-					case right: SquareEnter = left; break;
-				}
+				Direction OpositeEnter = Oposite(UnionEnter);
+				SquareEnter = Oposite(SquareEnter);
 
 				// if the dialated grid isn't filled in here we just go with the square grid
 				if (minDilated[y2][x2] == -1) {
@@ -306,12 +315,7 @@ private:
 					}
 
 					// swap the enterances because those are in the oposite direction
-					switch (DialatedEnter) {
-						case up: DialatedEnter = down; break;
-						case down: DialatedEnter = up; break;
-						case left: DialatedEnter = right; break;
-						case right: DialatedEnter = left; break;
-					}
+					DialatedEnter = Oposite(DialatedEnter);
 					
 					// Now we find the correct direction
 					if (DialatedEnter != none && DialatedEnter != SquareEnter && DialatedEnter != SquareExit && DialatedEnter != OpositeEnter) {
@@ -330,26 +334,14 @@ private:
 				}
 
 				// move to next cell to check for turn
-				switch (UnionExit) {
-					case up: --y2; break;
-					case down: ++y2; break;
-					case left: --x2; break;
-					case right: ++x2; break;
-					default: throw(1); break;
-				}
+				Shift(UnionExit, y2, x2);
 
 			} while (UnionEnter == UnionExit);			
 			
 			int BSy = y2, BSx = x2; // positions before they were shifted back
 
 			// undo last move
-			switch (UnionExit) {
-				case up: ++y2; break;
-				case down: --y2; break;
-				case left: ++x2; break;
-				case right: --x2; break;
-				default: throw(1); break;
-			}
+			Shift(Oposite(UnionExit), y2, x2);
 
 			// Mark points in ReducedGrid
 			if (curUnion == 0) {
@@ -364,13 +356,7 @@ private:
 					if (x1 == 0 && y1 == 0)
 						break;
 					ReducedGrid[y1][x1] = curUnion++;
-					switch (UnionEnter) {
-					case up: --y1; break;
-					case down: ++y1; break;
-					case left: --x1; break;
-					case right: ++x1; break;
-					default: throw(1);  break;
-					}
+					Shift(UnionEnter, y1, x1);
 				}
 				// fill corner
 				if (x1 == 0 && y1 == 0)
@@ -387,23 +373,20 @@ private:
 			UnionExit = none;
 		}
 		for (int i = 0; i < height; ++i) {
-			delete[] SquareCycles[width];
-			delete[] minDilated[width];
+			delete[] SquareCycles[i];
+			delete[] minDilated[i];
 		}
 		delete[] minDilated;
 		delete[] SquareCycles;
 		return ReducedGrid;
 	}
 
-// Given the grid "grid" has dimentions (height, width) this will find the 
-// preceeding and next cells and store them in the variables dir1 for the 
-// previous direction, and dir2 for the next direciton. If dir2 or dir2 are
-// the return will represent if they are accurate
-
-// This also assumes that the node is not empty (grid[y][x] != -1)
+	// Given the grid "grid" has dimentions (height, width) this will find the 
+	// preceeding and next cells and store them in the variables dir1 for the 
+	// previous direction, and dir2 for the next direciton. If dir2 or dir2 are
+	// the return will represent if they are accurate
+	// This also assumes that the node is not empty (grid[y][x] != -1)
 	bool GetDirection(int** grid, int y, int x, Direction& dir1, Direction& dir2, int height, int width, int max, int min = 0) {
-		Direction given1 = dir1, given2 = dir2;
-
 		int x2, y2;
 		int next = (grid[y][x] == max) ? min : grid[y][x] + 1;
 		int previous = (grid[y][x] == min) ? max : grid[y][x] - 1;
@@ -421,6 +404,18 @@ private:
 		else return false;
 	
 		return true;
+	}
+
+	// This shifts cells in the given direction
+	void Shift(Direction dir, int& y, int& x) {
+		switch (dir)
+		{
+			case up: --y; return;
+			case down: ++y; return;
+			case left: --x; return;
+			case right: ++x; return;
+			default: throw(1);
+		}
 	}
 };
 

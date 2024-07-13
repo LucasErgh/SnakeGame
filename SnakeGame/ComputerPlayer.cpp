@@ -11,6 +11,8 @@ ComputerPlayer::ComputerPlayer(int width, int height) : directions(NULL){
 	do {
 		apple.moveApple(this->width, this->height);
 	} while (snake.isSnake(apple.getCords()));
+
+	path = new PathFinderV4(&snake);
 }
 
 bool ComputerPlayer::DoTurn() {
@@ -19,10 +21,7 @@ bool ComputerPlayer::DoTurn() {
 		directions = NULL;
 	}
 	if (directions == NULL) {
-		PathFindingModel* model = new PathFinderV4(&snake);
-		directions = model->FindPath();
-		model->Delete();
-		delete model;
+		directions = path->FindPath(apple.getCords());
 	}
 	if (directions != NULL) {
 		Direction direction = directions->back();
@@ -32,13 +31,14 @@ bool ComputerPlayer::DoTurn() {
 
 	snake.move();
 
-	if (snake.headLocation() == apple.getCords()) {
+	if (snake.headLocation() == apple.getCords() && snake.size < height * width) {
 		snake.grow(growthRate);
 		do {
 			apple.moveApple(width, height);
 		} while (snake.isSnake(apple.getCords()));
 	}
 	if (snake.died()) {
+		path->Delete();
 		gameOver = true;
 		return false;
 	}

@@ -19,5 +19,8 @@ public:
 	void ControlInterface::endGame();
 
 	std::vector<Direction>* directions;
+
+private:
+	PathFindingModel* path;
 };
 

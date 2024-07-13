@@ -98,7 +98,7 @@ public:
 		}
 	}
 
-	std::vector<Direction>* PathFindingModel::FindPath() {
+	std::vector<Direction>* PathFindingModel::FindPath(cords goal) {
 		std::vector<Direction>* path = NULL;
 		int searchDepth = 1;
 		do {

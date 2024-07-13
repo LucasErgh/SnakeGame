@@ -17,6 +17,17 @@ enum Direction {
 	none
 };
 
+static Direction Oposite(Direction dir) {
+	switch (dir)
+	{
+	case up: return down;
+	case down: return up;
+	case left: return right;
+	case right: return left;
+	case none: return none;
+	}
+}
+
 static bool IsOposite(Direction dir1, Direction dir2) {
 	switch (dir1)
 	{
