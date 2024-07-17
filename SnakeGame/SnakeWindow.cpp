@@ -151,7 +151,7 @@ void SnakeWindow::Resize() {
 
 void SnakeWindow::EnterGame() {
 	if(!info)
-		info = new StateInfo(12, 12, 40, NULL);
+		info = new StateInfo(8, 8, 40, NULL);  
 	
 	if (SendMessage(GetDlgItem(m_hwnd, IDC_RADIO1), BM_GETCHECK, 0, 0) == BST_CHECKED)
 		info->gamemode = IDC_RADIO1;

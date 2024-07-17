@@ -31,8 +31,14 @@ bool ComputerPlayer::DoTurn() {
 
 	snake.move();
 
-	if (snake.headLocation() == apple.getCords() && snake.size < height * width) {
+	if (snake.headLocation() == apple.getCords()) {
 		snake.grow(growthRate);
+		if (snake.size == height * width) {
+			path->Delete();
+			delete path;
+			gameOver = true;
+			return false;
+		}
 		do {
 			apple.moveApple(width, height);
 		} while (snake.isSnake(apple.getCords()));
