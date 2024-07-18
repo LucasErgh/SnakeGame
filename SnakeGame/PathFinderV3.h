@@ -1,5 +1,8 @@
 #pragma once
+
 #include "PathFindingModel.h"
+#include "DataTypes.h"
+
 /*
 This was going to be a version of the a* method adapted to a grid rather than a graph but 
 I realized this method won't work because the different paths to the apple can't be reduced 
@@ -8,41 +11,190 @@ to how many moves it took to get there because the snake will move in different 
 
 class Node {
 public:
-	Node(bool obstical, cords cords, int movementCost, int distanceCost, int sumCost, int age = 0)
-		: obstical(obstical), cords(cords), age(age), movementCost(movementCost), distanceCost(distanceCost), sumCost(distanceCost + movementCost)
-	{}
+	Direction dir;
+	Node* parent;
+	cords pos;
+	int G; // Cost from initial state
+	int H; // Estimated cost of cheapest path
 
-	cords cords;
-	
-	bool obstical;
-	int age;
-	
-	int movementCost;
-	int distanceCost;
-	int sumCost;
+	Node(cords cords, Node* parent, Direction direction) {
+		pos = cords;
+		this->parent = parent;
+		G = H = 0;
+		dir = direction;
+	}
+
+	int GetScore() // Sum of G and H
+	{
+		return G + H;
+	}
 };
+
+typedef std::vector<Node*> NodeSet;
+typedef std::vector<cords> CordList;
 
 class PathFinderV3 : public PathFindingModel
 {
 public:
-	PathFinderV3(Snake *snake, int height, int width) {
-		grid = new Node**[width];
-		for (int i = 0; i < width; ++i) {
-			grid[i] = new Node*[height];
-		}
-		int i = snake->size - 1;
-		for (auto cur : snake->bodyLocation()) {
-			grid[cur.first][cur.second] = new Node(true, cur, 0, 0, 0, i--);
-		}
-		grid[snake->headLocation().first][snake->headLocation().second] = new Node(true, snake->headLocation(), 0, 0, 0, snake->size);
+	PathFinderV3(Snake *snake) {
+		updateSnake(snake);
+		start = snake->headLocation();
+		startDir = snake->direction;
+		height = snake->height;
+		width = snake->width;
+		size = snake->size;
 	}
+
 	void PathFindingModel::Delete() {
 
 	}
-	std::vector<Direction>* PathFindingModel::FindPath() {
 
+	void updateSnake(Snake *snake) {
+		walls.reserve(1);
+		walls = snake->bodyLocation();
 	}
+
+	std::vector<Direction>* PathFindingModel::FindPath(cords goal) {
+		Node* current = NULL;
+		NodeSet openSet; // This is for nodes whos edges have not been checked
+		NodeSet	closedSet; // This is for nodes whos edges have been checked
+
+		openSet.push_back(new Node(start, NULL, startDir));
+
+		while (!openSet.empty()) {
+			auto root = openSet.begin();
+			current = *root;
+
+			// Find best node as of now
+			for (auto cur = openSet.begin(); cur != openSet.end(); ++cur) {
+				auto node = *cur;
+				if (node->GetScore() <= current->GetScore()) {
+					current = node;
+					root = cur;
+				}
+			}
+
+			// Check if path was found
+			if (current->pos == goal) {
+				break;
+			}
+
+			//  
+			closedSet.push_back(current);
+			openSet.erase(root);
+
+			// Grow graph from new best cell
+			for (int i = 0; i < 4; ++i) {
+				// make new cell in correct direction
+				if (IsOposite((Direction)i, current->dir)) 
+					continue;
+				cords newCords(current->pos);
+				Shift((Direction)i, newCords);
+				if (collision(newCords, current->G + 1) || findNode(openSet, newCords)) {
+					continue;
+				}
+
+				int totalCost = current->G + 1;
+
+				Node* successor = findNode(openSet, newCords);
+				if (!successor) {
+					successor = new Node(newCords, current, (Direction)i);
+					successor->G = totalCost;
+					successor->H = distance(successor->pos, goal);
+					openSet.push_back(successor);
+				}
+				else if (totalCost < successor->G) {
+					successor->parent = current;
+					successor->G = totalCost;
+				}
+			}
+		}
+
+		CordList path;
+		while (current != NULL) {
+			path.push_back(current->pos);
+			current = current->parent;
+		}
+
+		for (auto cur : openSet) {
+			delete cur;
+		}
+		for (auto cur : closedSet) {
+			delete cur;
+		}
+
+		return getDirections(path);
+	}
+	
 private:
-	Node*** grid;
+	int size;
+	int height, width;
+	CordList walls;
+	cords start;
+	Direction startDir;
+
+	bool collision(cords check, int movement) {
+		if (check.first < 1 || check.first > width || check.second < 1 || check.second > height)
+			return true;
+		for (int i = 0; i < walls.size(); ++i) {
+			if (walls[i] == check && (size - i) > movement) {
+				return true;
+			}
+		}
+		
+
+		return false;
+	}
+
+	void Shift(Direction dir, cords &cur) {
+		switch (dir)
+		{
+		case up: --cur.second; return;
+		case down: ++cur.second; return;
+		case left: --cur.first; return;
+		case right: ++cur.first; return;
+		default: throw(1);
+		}
+	}
+
+	Node* findNode(NodeSet& nodes, cords cur) {
+		for (auto node : nodes) {
+			if (node->pos == cur) {
+				return node;
+			}
+		}
+		return NULL;
+	}
+
+	int distance(cords cords1, cords cords2) {
+		int total = 0;
+
+		if (cords1.first < cords2.first)
+			total += cords2.first - cords1.first;
+		else if (cords1.first > cords2.first)
+			total += cords1.first - cords2.first;
+
+		if (cords1.second < cords2.second)
+			total += cords2.second - cords1.second;
+		else if (cords1.second > cords2.second)
+			total += cords1.second - cords2.second;
+
+		return total;
+	}
+
+	std::vector<Direction>* getDirections(CordList cordList) {
+		std::vector<Direction>* directions = new std::vector<Direction>;
+
+		for (int i = 0; i < cordList.size() - 1; ++i) {
+			cords cur = cordList[i];
+			cords next = cordList[i + 1];
+
+			if (cur.second > next.second) directions->push_back(down);
+			else if (cur.second < next.second) directions->push_back(up);
+			else if (cur.first < next.first) directions->push_back(left);
+			else if (cur.first > next.first) directions->push_back(right);
+		}
+		return directions;
+	}
 };
 

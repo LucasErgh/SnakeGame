@@ -123,7 +123,7 @@ void SnakeWindow::OnPaint() {
 }
 
 int GetTime(int size) {
-	const int start = 100;
+	const int start = 280;
 	const int max = 80;
 	const double decayFactor = 0.95;
 	int speed;

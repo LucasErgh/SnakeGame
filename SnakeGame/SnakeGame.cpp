@@ -2,6 +2,8 @@
 #define UNICODE
 #endif 
 
+#pragma once
+
 #include <windows.h>
 #include <thread>
 #include <future>
