@@ -56,3 +56,5 @@ typedef std::pair<int, int> cords;
 typedef std::pair<cords, CellType> cell;
 
 typedef std::vector<cell> CellList;
+
+typedef std::vector<cords> CordList;
