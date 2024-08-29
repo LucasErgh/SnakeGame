@@ -368,7 +368,24 @@ HamCycle::~HamCycle() {
 	delete[] cycle;
 }
 
-
 HamCycle::HamCycle(int height, int width) : height(height), width(width), cycle(NULL), max(height * width - 1) {
 	cycle = GenerateCycle();
+}
+
+Direction HamCycle::nextDir(cords cords) {
+	int x = cords.first - 1, y = cords.second - 1;
+	int next = (cycle[y][x] == max) ? 0 : cycle[y][x] + 1;
+
+	if (y < height - 1 && cycle[y + 1][x] == next) return down;
+	else if (x > 0 && cycle[y][x - 1] == next) return left;
+	else if (y > 0 && cycle[y - 1][x] == next) return up;
+	else if (x < width - 1 && cycle[y][x + 1] == next) return right;
+	else return none;
+}
+
+int* HamCycle::operator[] (int row) {
+	return cycle[row];
+}
+const int* HamCycle::operator[] (int colm) const {
+	return cycle[colm];
 }

@@ -18,6 +18,14 @@ public:
 	// This is just to delete the cycle array when the object is deleted
 	~HamCycle();
 
+	// Overloading index operator so we can access 
+	// the array directly after it has been generated
+	int* operator[] (int row);
+	const int* operator[] (int colm) const;
+
+	// returns the next direction for a given location
+	Direction nextDir(cords cords);
+
 private:
 	int** cycle;
 	cords goal;
