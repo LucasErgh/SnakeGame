@@ -133,7 +133,6 @@
     <ClCompile Include="HamCycle.cpp" />
     <ClCompile Include="LaunchWindow.cpp" />
     <ClCompile Include="PathFinder.cpp" />
-    <ClCompile Include="PathFinderV2.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeGame.cpp" />
@@ -148,12 +147,7 @@
     <ClInclude Include="HamCycle.h" />
     <ClInclude Include="LaunchWindow.h" />
     <ClInclude Include="PathFinder.h" />
-    <ClInclude Include="PathFinderV2.h" />
-    <ClInclude Include="PathFinderV3.h" />
-    <ClInclude Include="PathFinderV4.h" />
-    <ClInclude Include="PathFindingModel.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="SearchTreeNode.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeWindow.h" />
     <ClInclude Include="StateInfo.h" />
