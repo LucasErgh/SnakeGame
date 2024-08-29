@@ -123,8 +123,8 @@ void SnakeWindow::OnPaint() {
 }
 
 int GetTime(int size) {
-	const int start = 280;
-	const int max = 80;
+	const int start = 300;
+	const int max = 150;
 	const double decayFactor = 0.95;
 	int speed;
 
@@ -173,6 +173,7 @@ void SnakeWindow::EnterGame() {
 		SetTimer(this->Window(), (int)IDC_RADIO1, 500, NULL);
 		break;
 	case IDC_RADIO3: // This is Player v Computer
+		throw(1); // Not implimented
 		info->model1 = new Player(info->columns, info->rows);
 		info->model2 = new ComputerPlayer(info->columns, info->rows);
 		SetTimer(this->Window(), (int)IDC_RADIO1, 500, NULL);
@@ -302,6 +303,10 @@ void SnakeWindow::TimerUp(int num) {
 LRESULT SnakeWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) 
 	{
+	case WM_CLOSE:
+		DestroyWindow(m_hwnd);
+		return 0;
+
 	case WM_CREATE:
 		if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory))) {
 			return -1; // this will fail CreateWindowEx
