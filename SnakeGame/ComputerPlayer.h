@@ -3,9 +3,7 @@
 #include <vector>
 
 #include "ControlInterface.h"
-#include "SearchTreeNode.h"
-#include "PathFinderV3.h"
-#include "PathFinderV4.h"
+#include "PathFinder.h"
 
 class ComputerPlayer : public ControlInterface
 {
@@ -21,6 +19,6 @@ public:
 	std::vector<Direction>* directions;
 
 private:
-	PathFindingModel* path;
+	PathFinder* path;
 };
 

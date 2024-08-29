@@ -12,7 +12,7 @@ ComputerPlayer::ComputerPlayer(int width, int height) : directions(NULL){
 		apple.moveApple(this->width, this->height);
 	} while (snake.isSnake(apple.getCords()));
 
-	path = new PathFinderV4(&snake);
+	path = new PathFinder(width, height);
 }
 
 bool ComputerPlayer::DoTurn() {
@@ -22,7 +22,7 @@ bool ComputerPlayer::DoTurn() {
 	}
 	if (directions == NULL) {
 		//path = new PathFinderV3(&snake);
-		directions = path->FindPath(apple.getCords());
+		directions = path->FindPath(&snake, apple.getCords());
 	}
 	if (directions != NULL && directions->size() != 0) {
 		Direction direction = directions->back();

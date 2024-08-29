@@ -1,11 +1,19 @@
 #include "PathFinder.h"
 
-PathFinder::PathFinder(int width, int height) : snake(NULL), width(width), height(height), max(width* height - 1) {
-	cycle = GenerateCycle(width, height);
+void PathFinder::Delete() {
+	snake->deleteNodes();
+	delete snake;
 }
 
-std::vector<Direction>* PathFinder::FindPath(Snake* snake, cords goal) {
+PathFinder::PathFinder(int width, int height) : cycle(HamCycle(width, height)), star(AStar(snake)), snake(NULL), width(width), height(height) {}
 
+std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
+	UpdateSnake(newSnake);
+	star.updateSnake(snake);
+	std::vector<Direction>* path = star.FindPath(goal);
+	// std::vector<Direction>* path = cycle.FindPath(snake, goal);
+
+	return path;
 }
 
 void PathFinder::UpdateSnake(Snake* snake) {
@@ -17,12 +25,6 @@ void PathFinder::UpdateSnake(Snake* snake) {
 	// Uses overloaded copy constructor to make a copy we can modify
 	this->snake = new Snake(*snake);
 
-	// Creates AStar pathfinding object if it doesn't already exist
-	// and if it does exist it updates it with the new snake
-	if (!aStar) {
-		aStar = new AStar(this->snake);
-	}
-	else {
-		aStar->updateSnake(this->snake);
-	}
+	// Updates AStar's version of the snake
+	star.updateSnake(this->snake);
 }

@@ -77,17 +77,20 @@ std::vector<Direction>* AStar::getDirections(CordList cordList) {
 }
 
 AStar::AStar(Snake* snake) {
-	updateSnake(snake);
-	start = snake->headLocation();
-	startDir = snake->direction;
-	height = snake->height;
-	width = snake->width;
-	size = snake->size;
+	if (snake) {
+		updateSnake(snake);
+	}
 }
 
 void AStar::updateSnake(Snake* snake) {
 	walls.reserve(1);
 	walls = snake->bodyLocation();
+
+	start = snake->headLocation();
+	startDir = snake->direction;
+	height = snake->height;
+	width = snake->width;
+	size = snake->size;
 }
 
 std::vector<Direction>* AStar::FindPath(cords goal) {

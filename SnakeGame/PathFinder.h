@@ -16,11 +16,12 @@ public:
 	// Returns set of directions for snake to follow
 	std::vector<Direction>* FindPath(Snake* snake, cords goal);
 
+	void Delete();
+
 private:
-	AStar* aStar;
+	HamCycle cycle;
+	AStar star;
 	int width, height;
-	int max;
-	int** cycle;
 	Snake* snake;
 
 	// This will make a copy of the snake for my pathfinders to use

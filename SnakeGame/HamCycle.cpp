@@ -1,6 +1,6 @@
 #include "HamCycle.h"
 
-int** GenerateCycle(int width, int height) {
+int** HamCycle::GenerateCycle() {
 	// At the moment this only works for square grids with side lengths divisible by four
 	if (width != height || width % 2 != 0) {
 		throw(1);
@@ -296,7 +296,7 @@ int** GenerateCycle(int width, int height) {
 	return ReducedGrid;
 }
 
-bool GetDirection(int** grid, int y, int x, Direction* dir1, Direction* dir2, int height, int width, int max, int min = 0) {
+bool HamCycle::GetDirection(int** grid, int y, int x, Direction* dir1, Direction* dir2, int height, int width, int max, int min) {
 	int x2, y2;
 	int next = (grid[y][x] == max) ? min : grid[y][x] + 1;
 	int previous = (grid[y][x] == min) ? max : grid[y][x] - 1;
@@ -317,7 +317,7 @@ bool GetDirection(int** grid, int y, int x, Direction* dir1, Direction* dir2, in
 	return true;
 }
 
-void Shift(Direction dir, int& y, int& x) {
+void HamCycle::Shift(Direction dir, int& y, int& x) {
 	switch (dir)
 	{
 	case up: --y; return;
@@ -326,4 +326,49 @@ void Shift(Direction dir, int& y, int& x) {
 	case right: ++x; return;
 	default: throw(1);
 	}
+}
+
+std::vector<Direction>* HamCycle::FindPath(Snake* snake, cords goal) {
+	cords apple;
+
+	std::vector<Direction>* directions = new std::vector<Direction>;
+
+	cords cell = snake->headLocation();
+	--cell.first;
+	--cell.second;
+	Direction last = snake->direction;
+	Direction dir;
+
+	apple = cords(goal.first - 1, goal.second - 1);
+	bool foundApple = false;
+
+	while (!foundApple)
+	{
+		GetDirection(cycle, cell.second, cell.first, NULL, &dir, height, width, max);
+		if (IsOposite(dir, last)) {
+			directions->insert(directions->begin(), snake->direction);
+			Shift(snake->direction, cell.second, cell.first);
+			continue;
+		}
+		Shift(dir, cell.second, cell.first);
+		directions->insert(directions->begin(), dir);
+		if (cell == apple) {
+			return directions;
+		}
+		last = dir;
+	}
+
+	return directions;
+}
+
+HamCycle::~HamCycle() {
+	for (int i = 0; i < height; ++i) {
+		delete[] cycle[i];
+	}
+	delete[] cycle;
+}
+
+
+HamCycle::HamCycle(int height, int width) : height(height), width(width), cycle(NULL), max(height * width - 1) {
+	cycle = GenerateCycle();
 }
