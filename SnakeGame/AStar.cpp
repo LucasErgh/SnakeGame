@@ -95,8 +95,8 @@ void AStar::updateSnake(Snake* snake) {
 
 std::vector<Direction>* AStar::FindPath(cords goal) {
 	Node* current = NULL;
-	NodeSet openSet; // This is for nodes whos edges have not been checked
-	NodeSet	closedSet; // This is for nodes whos edges have been checked
+	NodeSet openSet; // This is for nodes who have not been checked
+	NodeSet	closedSet; // This is for nodes who have been checked
 
 	openSet.push_back(new Node(start, NULL, startDir));
 
@@ -125,11 +125,11 @@ std::vector<Direction>* AStar::FindPath(cords goal) {
 		// Grow graph from new best cell
 		for (int i = 0; i < 4; ++i) {
 			// make new cell in correct direction
-			if (IsOposite((Direction)i, current->dir))
-				continue;
-			cords newCords(current->pos);
+			if (IsOposite((Direction)i, current->dir)) continue;
+			
+			cords newCords = current->pos;
 			Shift((Direction)i, newCords);
-			if (collision(newCords, current->G + 1) || findNode(openSet, newCords)) {
+			if (collision(newCords, current->G + 1) || findNode(closedSet, newCords)) {
 				continue;
 			}
 

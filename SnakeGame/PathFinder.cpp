@@ -12,38 +12,55 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	// Update Board
 	this->goal = goal;
 	UpdateSnake(newSnake);
-	
-	static bool tryShortCut = true;
-	// after the snake has filled 80% of the board we no longer try to shortcut because
-	// it is likely that apples will show up unexpectedly preventing the snake from following the cycle
-	if (tryShortCut && snake->size > width * height * .8) tryShortCut = false;
-	
-	std::vector<Direction>* path;
-	if (tryShortCut) {
-		path = star.FindPath(goal);
+
+	 
+	// Try to find the A* path
+	std::vector<Direction>* path = star.FindPath(goal);
+
+	// Check if its safe
+	if (safe(path))
+	{
+		return path;
 	}
+	// if not follow cycle
 	else {
-		return RejoinCycle(max);
-	}
-	
-	// Now we check to see if the A* path is safe
-	std::vector<Direction>* rejoinPath = RejoinCycle(max / 2);
-	
-	// If so we use that
-	if (rejoinPath) {
-		while(!rejoinPath->empty()){
-			path->insert(path->begin(), rejoinPath->back());
-			rejoinPath->pop_back();
+		Snake* simulatedSnake = SimulateMove(path);
+		std::vector<Direction>* cyclePath = RejoinCycle(simulatedSnake);
+		
+		if (cyclePath && safe(cyclePath)) {
+			// Append cyclePath to path
+			int size = cyclePath->size();
+			for (int i = 0; i < size; ++i) {
+				path->insert(path->begin(), cyclePath->back());
+				cyclePath->pop_back();
+			}
 		}
+
+		delete simulatedSnake;
+
+		if (path && safe(path)) {
+			delete cyclePath;
+			return path;
+		}
+
+		if (cyclePath && safe(cyclePath)) {
+			delete path;  // Clean up the previous unsafe path
+			return cyclePath;  // Return the safe cycle path
+		}
+
+		delete cyclePath;
+
+		// Try to rejoin the cycle from the current snake position
+		cyclePath = RejoinCycle(snake);
+		if (cyclePath && safe(cyclePath)) {
+			delete path;  // Clean up the previous unsafe path
+			return cyclePath;  // Return the safe path
+		}
+	}
+	delete path;  // Clean up the previous path
+	throw (1); //Handle the case where no safe path is found
+
 	
-	}
-	// Otherwise we follow the cycle
-	else {
-		delete path;
-		path = RejoinCycle(max);
-	}
-	delete rejoinPath;
-	return path;	
 }
 
 void PathFinder::UpdateSnake(Snake* snake) {
@@ -60,38 +77,91 @@ void PathFinder::UpdateSnake(Snake* snake) {
 }
 
 bool PathFinder::safe(std::vector<Direction>* path) {	
+	if (!path || path->empty()) return false;
+
 		// Get the snake after the move so we can test for saftey
-		Snake temp = *SimulateMove(path);
+		Snake temp;
+		temp = *SimulateMove(path);
 
 		// Now check if we can travel on the cycle for a number of moves that
 		// grows exponentially based on the size of the snake
-		int turns = temp.size + 3;
-		turns = (turns > height * width - 1) ? height * width - 1 : turns;
+		int turns = 12;// std::max(12.0, std::pow(2, snake->size / 10));
 	
-		for (int i = 0; i < turns; ++i) {
+		for (int i = 12; i >= 0; --i) {
 			if (temp.died() || IsOposite(temp.direction, cycle.nextDir(temp.headLocation()))) 
 				return false;
 			temp.changeDirection(cycle.nextDir(temp.headLocation()));
 			temp.move();
 		}
+		
 		return true;
 }
 
-std::vector<Direction>* PathFinder::RejoinCycle(int attempts) {
-	int cur = 0;
-	// Find nearest node to rejoin
-	cords toJoin = nextCycleNode(snake->headLocation());
-	// Check if it can contine, if not loop to the next spot and check that
-	std::vector<Direction> path = *star.FindPath(toJoin);
-	while (!safe(&path) && cur <= attempts) {
-		toJoin = nextCycleNode(toJoin);
-		path = *star.FindPath(toJoin);
-		if (toJoin == snake->headLocation()) return NULL;
-		++cur;
-	}
-	// Join
-	return &path;
+int PathFinder::distance(cords a, cords b) {
+	int distance = 0;
+	if (a.first > b.first)	distance += a.first - b.first;
+	else					distance += b.first - a.first;
+	if (a.second > b.second)distance += a.second - b.second;
+	else					distance += b.second - a.second;
+	return distance;
 }
+
+std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake) {
+	std::vector<cords> nodes;
+	for (int i = 0; i < height; ++i) {
+		for (int j = 0; j < width; ++j) {
+			nodes.push_back(std::make_pair(j, i));
+		}
+	}
+
+	bool safepath = false;
+	int minDistance = height * width, tempd;
+
+	std::vector<Direction>* path = NULL;
+
+	while (!nodes.empty()) {
+		
+		cords closestNode;
+		int closestNodeIndex = -1;
+
+		for (int i = 0; i < nodes.size(); ++i) {
+			cords cur = nodes[i];
+			int currentDistance = distance(cur, snake->headLocation());
+			if (currentDistance < minDistance) {
+				minDistance = distance(cur, snake->headLocation());
+				closestNode = cur;
+				closestNodeIndex = i;
+			}
+		}
+
+		// Erase the closest node from the list
+		if (closestNodeIndex != -1) {
+			nodes.erase(nodes.begin() + closestNodeIndex);
+		}
+
+		// Try to find a path to the closest node
+		star.updateSnake(snake);
+		path = star.FindPath(closestNode);
+		if (path && safe(path)) {
+			/*for (int i = 0; i < snake->size; ++i) {
+				path->insert(path->begin(), cycle.nextDir(closestNode));
+				cycle.Shift(path->front(), closestNode.second, closestNode.first);
+			}*/
+			return path;  // Return the first safe path found
+		}
+		else {
+			delete path;  // Clean up the memory if the path is unsafe
+			path = nullptr;  // Reset the pointer for the next iteration
+		}
+
+		// Reset minDistance for the next iteration
+		minDistance = height * width;
+	}
+	return NULL;
+}
+
+
+
 
 cords PathFinder::nextCycleNode(cords start) {
 	int max = height * width - 1;
@@ -117,6 +187,9 @@ Snake* PathFinder::SimulateMove(std::vector<Direction>* path) {
 		tempPath->pop_back();
 		temp->changeDirection(dir);
 		temp->move();
+		if (temp->headLocation() == goal) {
+			temp->grow(1);
+		}
 	}
 	delete tempPath;
 	return temp;

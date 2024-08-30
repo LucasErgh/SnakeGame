@@ -389,3 +389,14 @@ int* HamCycle::operator[] (int row) {
 const int* HamCycle::operator[] (int colm) const {
 	return cycle[colm];
 }
+
+Direction HamCycle::prevDir(cords cords) {
+	int x = cords.first - 1, y = cords.second - 1;
+	int next = (cycle[y][x] == 0) ? max : cycle[y][x] - 1;
+
+	if (y < height - 1 && cycle[y + 1][x] == next) return down;
+	else if (x > 0 && cycle[y][x - 1] == next) return left;
+	else if (y > 0 && cycle[y - 1][x] == next) return up;
+	else if (x < width - 1 && cycle[y][x + 1] == next) return right;
+	else return none;
+}

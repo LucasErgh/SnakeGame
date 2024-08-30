@@ -26,14 +26,17 @@ public:
 	// returns the next direction for a given location
 	Direction nextDir(cords cords);
 
+	// returns the direction you have to go for the previous node
+	Direction prevDir(cords cords);
+
+	// This shifts cells in the given direction
+	void Shift(Direction dir, int& y, int& x);
+
 private:
 	int** cycle;
 	cords goal;
 	int height, width;
 	int max;
-
-	// This shifts cells in the given direction
-	void Shift(Direction dir, int& y, int& x);
 
 	// Given the grid "grid" has dimentions (height, width) this will find the 
 	// preceeding and next cells and store them in the variables dir1 for the 

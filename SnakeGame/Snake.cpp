@@ -8,7 +8,7 @@ Snake::Snake() {
 	width = 10;
 	head = new SnakeNode(std::make_pair(1, 1), nullptr, nullptr);
 	tail = head;
-	direction = up;
+	direction = none;
 	size = 1;
 	maxSize = size;
 }
@@ -16,7 +16,7 @@ Snake::Snake() {
 Snake::Snake(cords start, int width, int height) : width(width), height(height) {
 	head = new SnakeNode(start, nullptr, nullptr);
 	tail = head;
-	direction = up;
+	direction = none;
 	size = 1;
 	maxSize = size;
 }
@@ -40,25 +40,9 @@ Snake::Snake(const Snake& snake) {
 	tail = newCur;
 }
 
-//Snake* Snake::MakeCopy() {
-//	Snake* NewSnake = new Snake(this->headLocation(), width, height);
-//	NewSnake->maxSize = this->maxSize;
-//	NewSnake->size = this->size;
-//	NewSnake->direction = this->direction;
-//
-//	SnakeNode* cur = this->head;
-//	SnakeNode* newCur = NewSnake->head;
-//	while (cur->back != NULL) {
-//		cur = cur->back;
-//		newCur->back = new SnakeNode(cur->cordinates, newCur, NULL);
-//		newCur = newCur->back;
-//	}
-//	NewSnake->tail = newCur;
-//
-//	return NewSnake;
-//}
-
 cords Snake::move() {
+	if (direction == none) return head->cordinates;
+
 	// Create new had location based on current head location
 	cords newLocation(head->cordinates);
 
