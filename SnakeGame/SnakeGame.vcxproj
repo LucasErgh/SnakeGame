@@ -131,7 +131,6 @@
     <ClCompile Include="ComputerPlayer.cpp" />
     <ClCompile Include="ControlInterface.cpp" />
     <ClCompile Include="HamCycle.cpp" />
-    <ClCompile Include="LaunchWindow.cpp" />
     <ClCompile Include="PathFinder.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snake.cpp" />
@@ -145,7 +144,6 @@
     <ClInclude Include="ControlInterface.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="HamCycle.h" />
-    <ClInclude Include="LaunchWindow.h" />
     <ClInclude Include="PathFinder.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Snake.h" />
