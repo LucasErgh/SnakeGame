@@ -21,52 +21,48 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	{
 		return path;
 	}
-	//// can it be made safe with rejoin function
-	//Snake* simulatedSnaked = SimulateMove(path);
-	//if (simulatedSnaked) {
-	//	std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnaked, 5);
-	//	if (rejoinPath) {
-	//		simulatedSnaked->deleteNodes();
-	//		delete simulatedSnaked;
-	//		simulatedSnaked = NULL;
-	//		// now append the old path to the new path
-	//		for (int i = 0; i < rejoinPath->size(); ++i) {
-	//			path->insert(path->begin(), rejoinPath->back());
-	//			rejoinPath->pop_back();
-	//		}
-	//		delete rejoinPath;
-	//		if (safe(path))
-	//			return path;
+	// check if it can be made safe with rejoin function
+	Snake* simulatedSnaked = SimulateMove(path);
+	if (simulatedSnaked) {
+		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnaked, 5);
+		if (rejoinPath) {
+			simulatedSnaked->deleteNodes();
+			delete simulatedSnaked;
+			simulatedSnaked = NULL;
+			// now append the old path to the new path
+			for (int i = 0; i < rejoinPath->size(); ++i) {
+				path->insert(path->begin(), rejoinPath->back());
+				rejoinPath->pop_back();
+			}
+			delete rejoinPath;
+			if (safe(path))
+				return path;
 
-	//	}
-	//}
-	// if not follow cycle
-
-	//if (simulatedSnaked) {
-	//	simulatedSnaked->deleteNodes();
-	//	delete simulatedSnaked;
-	//	simulatedSnaked = NULL;
-	//}
+		}
+	}
+	// Free unused memory
+	if (simulatedSnaked) {
+		simulatedSnaked->deleteNodes();
+		delete simulatedSnaked;
+		simulatedSnaked = NULL;
+	}
 	delete path;
 	path = NULL;
 
+	// Now just try to rejoin cycle without new path
 	Snake* simulatedSnake = new Snake(*snake);
 	std::vector<Direction>* cyclePath = RejoinCycle(simulatedSnake, width);
 
 	if (cyclePath && safe(cyclePath)) {
 		return cyclePath;
 	}
-
 	delete simulatedSnake;
 	delete cyclePath;
 
-
-	// if there is path found I just 
+	// if not follow cycle (This will probably cause the snake to die) 
 	path = new std::vector<Direction>;
 	path->push_back(cycle.nextDir(snake->headLocation()));
 	return path;
-
-	throw (1); //Handle the case where no safe path is found
 }
 
 void PathFinder::UpdateSnake(Snake* snake) {
