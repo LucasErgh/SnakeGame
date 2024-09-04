@@ -37,7 +37,7 @@ private:
 
 	// This will keep attempting to rejoing the cycle at the nearest node and if
 	// it fails it will try the next nearest and so on untill it succeeds
-	std::vector<Direction>* RejoinCycle(Snake* snake);
+	std::vector<Direction>* RejoinCycle(Snake* snake, int radius);
 
 	// This will make a copy of the active snake and make that snake 
 	// move through the given path for the purposes of testing if its safe

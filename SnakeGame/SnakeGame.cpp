@@ -14,7 +14,6 @@
 #include "Player.h"
 #include "ControlInterface.h"
 #include "StateInfo.h"
-#include "LaunchWindow.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {

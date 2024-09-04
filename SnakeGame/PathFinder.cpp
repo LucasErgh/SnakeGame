@@ -21,23 +21,47 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	{
 		return path;
 	}
-	// if not follow cycle
-	else {
-		delete path;
+	// can it be made safe with rejoin function
+	Snake* simulatedSnaked = SimulateMove(path);
+	if (simulatedSnaked) {
+		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnaked, 5);
+		if (rejoinPath) {
+			simulatedSnaked->deleteNodes();
+			delete simulatedSnaked;
+			simulatedSnaked = NULL;
+			// now append the old path to the new path
+			for (auto& cur : *rejoinPath) {
+				path->insert(path->begin(), cur);
+			}
+			delete rejoinPath;
+			if (safe(path))
+				return path;
 
-		Snake* simulatedSnake = new Snake(*snake);
-		std::vector<Direction>* cyclePath = RejoinCycle(simulatedSnake);
-		
-		if (cyclePath && safe(cyclePath)) {
-			return cyclePath;
 		}
+	}
+	// if not follow cycle
 
-		delete simulatedSnake;
-		delete cyclePath;
+	if (simulatedSnaked) {
+		simulatedSnaked->deleteNodes();
+		delete simulatedSnaked;
+		simulatedSnaked = NULL;
+	}
+	delete path;
+	path = NULL;
+
+	Snake* simulatedSnake = new Snake(*snake);
+	std::vector<Direction>* cyclePath = RejoinCycle(simulatedSnake, width);
+
+	if (cyclePath && safe(cyclePath)) {
+		return cyclePath;
 	}
 
+	delete simulatedSnake;
+	delete cyclePath;
+
+
 	// if there is path found I just 
-	std::vector<Direction>* path = new std::vector<Direction>; 
+	path = new std::vector<Direction>;
 	path->push_back(cycle.nextDir(snake->headLocation()));
 	return path;
 
@@ -92,7 +116,7 @@ int PathFinder::distance(cords a, cords b) {
 	return distance;
 }
 
-std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake) {
+std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake, int radius) {
 	// First check if we are already on the cycle
 	std::vector<Direction>* cyclePath = new std::vector<Direction>;
 	cords cur = snake->headLocation();
@@ -106,9 +130,15 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake) {
 
 	// otherwise we find a path back to the cycle
 	std::vector<cords> nodes;
+	int xmin, ymin, xmax, ymax;
+	xmin = (snake->headLocation().first - radius >= 0) ? snake->headLocation().first - radius : 0;
+	ymin = (snake->headLocation().second - radius >= 0) ? snake->headLocation().second - radius : 0;
+	xmax = (snake->headLocation().first + radius < width) ? snake->headLocation().first + radius : width - 1;
+	ymax = (snake->headLocation().second + radius < height) ? snake->headLocation().first + radius : height - 1;
+
 	// load list of all ordered pairs into nodes
-	for (int i = 0; i < height; ++i) {
-		for (int j = 0; j < width; ++j) {
+	for (int i = ymin; i <= ymax; ++i) {
+		for (int j = xmin; j <= xmax; ++j) {
 			nodes.push_back(std::make_pair(j, i));
 		}
 	}

@@ -49,7 +49,7 @@ void SnakeWindow::OnPaint() {
 
 		pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		if (info && (info->gamemode == IDC_RADIO1 || info->gamemode == IDC_RADIO2) && info->model1 && info->model1->isAlive()) {
+		if (info && (info->gamemode == IDC_RADIO1 || info->gamemode == IDC_RADIO2) && info->model1) {
 			// Draw Grid
 			int offset = 10;
 			int scale = info->scale;
