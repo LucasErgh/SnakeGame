@@ -49,7 +49,10 @@ void SnakeWindow::OnPaint() {
 
 		pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		if (info && (info->gamemode == IDC_RADIO1 || info->gamemode == IDC_RADIO2) && info->model1 && info->model1->isAlive()) {
+		if (info && (info->gamemode == IDC_RADIO1 || info->gamemode == IDC_RADIO2) && info->model1 && info->ingame) {
+			if (info->model1->isAlive()) {
+				static std::vector <cell> lastCellList = info->model1->GetCells();
+			}
 			// Draw Grid
 			int offset = 10;
 			int scale = info->scale;
@@ -151,7 +154,8 @@ void SnakeWindow::Resize() {
 
 void SnakeWindow::EnterGame() {
 	if(!info)
-		info = new StateInfo(8, 8, 20, NULL);  
+		info = new StateInfo(8, 8, 45, NULL);  
+	info->ingame = true;
 	
 	if (SendMessage(GetDlgItem(m_hwnd, IDC_RADIO1), BM_GETCHECK, 0, 0) == BST_CHECKED)
 		info->gamemode = IDC_RADIO1;
@@ -194,6 +198,7 @@ void SnakeWindow::ExitGame() {
 	std::wstring score = L"Game Over! Your score is: " + std::to_wstring(model->Score());
 	MessageBox(m_hwnd, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
 
+	info->ingame = false;
 	if (info->model1) {
 		info->model1->endGame();
 		delete info->model1;

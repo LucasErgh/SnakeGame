@@ -44,5 +44,8 @@ private:
 	Snake* SimulateMove(std::vector<Direction>* path);
 
 	int distance(cords a, cords b);
+
+	// Follows cycle for a given number of nodes
+	std::vector<Direction>* FollowPath(int num);
 };
 

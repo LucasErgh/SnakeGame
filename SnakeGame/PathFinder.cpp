@@ -22,13 +22,16 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 		return path;
 	}
 	// check if it can be made safe with rejoin function
-	Snake* simulatedSnaked = SimulateMove(path);
-	if (simulatedSnaked) {
-		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnaked, 5);
+
+	// The problem is in here  ||
+	//                         \/
+	Snake* simulatedSnake = SimulateMove(path);
+	if (simulatedSnake) {
+		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnake, 5);
 		if (rejoinPath) {
-			simulatedSnaked->deleteNodes();
-			delete simulatedSnaked;
-			simulatedSnaked = NULL;
+			simulatedSnake->deleteNodes();
+			delete simulatedSnake;
+			simulatedSnake = NULL;
 			// now append the old path to the new path
 			for (int i = 0; i < rejoinPath->size(); ++i) {
 				path->insert(path->begin(), rejoinPath->back());
@@ -37,21 +40,23 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 			delete rejoinPath;
 			if (safe(path))
 				return path;
-
 		}
 	}
+	//							/\
+	//							||
+	
 	// Free unused memory
-	if (simulatedSnaked) {
-		simulatedSnaked->deleteNodes();
-		delete simulatedSnaked;
-		simulatedSnaked = NULL;
+	if (simulatedSnake) {
+		simulatedSnake->deleteNodes();
+		delete simulatedSnake;
+		simulatedSnake = NULL;
 	}
 	delete path;
 	path = NULL;
 
 	// Now just try to rejoin cycle without new path
-	Snake* simulatedSnake = new Snake(*snake);
-	std::vector<Direction>* cyclePath = RejoinCycle(simulatedSnake, width);
+	simulatedSnake = new Snake(*snake);
+	std::vector<Direction>* cyclePath = FollowPath(8);
 
 	if (cyclePath && safe(cyclePath)) {
 		return cyclePath;
@@ -89,7 +94,7 @@ bool PathFinder::safe(std::vector<Direction>* path) {
 
 		// Now check if we can travel on the cycle for a number of moves that
 		// grows exponentially based on the size of the snake
-		int turns = snake->size;// std::max(12.0, std::pow(2, snake->size / 10));
+		int turns = temp->size * 1.2;// std::max(12.0, std::pow(2, snake->size / 10));
 	
 		for (int i = 0; i < turns; ++i) {
 			if (temp->died() || IsOposite(temp->direction, cycle.nextDir(temp->headLocation())))
@@ -117,7 +122,7 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake, int radius) {
 	// First check if we are already on the cycle
 	std::vector<Direction>* cyclePath = new std::vector<Direction>;
 	cords cur = snake->headLocation();
-	for (int i = 0; i < snake->size; ++i) {
+	for (int i = 0; i < snake->size * 1.5; ++i) {
 		cyclePath->insert(cyclePath->begin(), cycle.nextDir(cur));
 		cycle.Shift(cycle.nextDir(cur), cur.second, cur.first);
 	}
@@ -128,10 +133,10 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake, int radius) {
 	// otherwise we find a path back to the cycle
 	std::vector<cords> nodes;
 	int xmin, ymin, xmax, ymax;
-	xmin = (snake->headLocation().first - radius >= 0) ? snake->headLocation().first - radius : 0;
-	ymin = (snake->headLocation().second - radius >= 0) ? snake->headLocation().second - radius : 0;
-	xmax = (snake->headLocation().first + radius < width) ? snake->headLocation().first + radius : width - 1;
-	ymax = (snake->headLocation().second + radius < height) ? snake->headLocation().first + radius : height - 1;
+	xmin = (snake->headLocation().first - radius >= 1) ? snake->headLocation().first - radius : 1;
+	ymin = (snake->headLocation().second - radius >= 1) ? snake->headLocation().second - radius : 1;
+	xmax = (snake->headLocation().first + radius <= width) ? snake->headLocation().first + radius : width;
+	ymax = (snake->headLocation().second + radius <= height) ? snake->headLocation().first + radius : height;
 
 	// load list of all ordered pairs into nodes
 	for (int i = ymin; i <= ymax; ++i) {
@@ -223,4 +228,14 @@ Snake* PathFinder::SimulateMove(std::vector<Direction>* path) {
 	}
 	delete tempPath;
 	return temp;
+}
+
+std::vector<Direction>* PathFinder::FollowPath(int num) {
+	cords cur = snake->headLocation();
+	std::vector<Direction>* path = new std::vector<Direction>;
+	for (int i = 0; i < num; ++i) {
+		path->insert(path->begin(), cycle.nextDir(cur));
+		cycle.Shift((*path)[0], cur.second, cur.first);
+	}
+	return path;
 }
