@@ -21,31 +21,32 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	{
 		return path;
 	}
-	// can it be made safe with rejoin function
-	Snake* simulatedSnaked = SimulateMove(path);
-	if (simulatedSnaked) {
-		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnaked, 5);
-		if (rejoinPath) {
-			simulatedSnaked->deleteNodes();
-			delete simulatedSnaked;
-			simulatedSnaked = NULL;
-			// now append the old path to the new path
-			for (auto& cur : *rejoinPath) {
-				path->insert(path->begin(), cur);
-			}
-			delete rejoinPath;
-			if (safe(path))
-				return path;
+	//// can it be made safe with rejoin function
+	//Snake* simulatedSnaked = SimulateMove(path);
+	//if (simulatedSnaked) {
+	//	std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnaked, 5);
+	//	if (rejoinPath) {
+	//		simulatedSnaked->deleteNodes();
+	//		delete simulatedSnaked;
+	//		simulatedSnaked = NULL;
+	//		// now append the old path to the new path
+	//		for (int i = 0; i < rejoinPath->size(); ++i) {
+	//			path->insert(path->begin(), rejoinPath->back());
+	//			rejoinPath->pop_back();
+	//		}
+	//		delete rejoinPath;
+	//		if (safe(path))
+	//			return path;
 
-		}
-	}
+	//	}
+	//}
 	// if not follow cycle
 
-	if (simulatedSnaked) {
-		simulatedSnaked->deleteNodes();
-		delete simulatedSnaked;
-		simulatedSnaked = NULL;
-	}
+	//if (simulatedSnaked) {
+	//	simulatedSnaked->deleteNodes();
+	//	delete simulatedSnaked;
+	//	simulatedSnaked = NULL;
+	//}
 	delete path;
 	path = NULL;
 
