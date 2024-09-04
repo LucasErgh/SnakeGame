@@ -123,8 +123,8 @@ void SnakeWindow::OnPaint() {
 }
 
 int GetTime(int size) {
-	const int start = 300;
-	const int max = 150;
+	const int start = 150;
+	const int max = 30;
 	const double decayFactor = 0.95;
 	int speed;
 
@@ -151,7 +151,7 @@ void SnakeWindow::Resize() {
 
 void SnakeWindow::EnterGame() {
 	if(!info)
-		info = new StateInfo(8, 8, 40, NULL);  
+		info = new StateInfo(16, 16, 20, NULL);  
 	
 	if (SendMessage(GetDlgItem(m_hwnd, IDC_RADIO1), BM_GETCHECK, 0, 0) == BST_CHECKED)
 		info->gamemode = IDC_RADIO1;

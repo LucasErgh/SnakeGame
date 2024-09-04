@@ -71,9 +71,6 @@
     <ClInclude Include="ComputerPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LaunchWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PathFinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -81,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HamCycle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LaunchWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

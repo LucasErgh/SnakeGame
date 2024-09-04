@@ -13,7 +13,6 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	this->goal = goal;
 	UpdateSnake(newSnake);
 
-	 
 	// Try to find the A* path
 	std::vector<Direction>* path = star.FindPath(goal);
 
@@ -24,43 +23,25 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	}
 	// if not follow cycle
 	else {
-		Snake* simulatedSnake = SimulateMove(path);
+		delete path;
+
+		Snake* simulatedSnake = new Snake(*snake);
 		std::vector<Direction>* cyclePath = RejoinCycle(simulatedSnake);
 		
 		if (cyclePath && safe(cyclePath)) {
-			// Append cyclePath to path
-			int size = cyclePath->size();
-			for (int i = 0; i < size; ++i) {
-				path->insert(path->begin(), cyclePath->back());
-				cyclePath->pop_back();
-			}
+			return cyclePath;
 		}
 
 		delete simulatedSnake;
-
-		if (path && safe(path)) {
-			delete cyclePath;
-			return path;
-		}
-
-		if (cyclePath && safe(cyclePath)) {
-			delete path;  // Clean up the previous unsafe path
-			return cyclePath;  // Return the safe cycle path
-		}
-
 		delete cyclePath;
-
-		// Try to rejoin the cycle from the current snake position
-		cyclePath = RejoinCycle(snake);
-		if (cyclePath && safe(cyclePath)) {
-			delete path;  // Clean up the previous unsafe path
-			return cyclePath;  // Return the safe path
-		}
 	}
-	delete path;  // Clean up the previous path
-	throw (1); //Handle the case where no safe path is found
 
-	
+	// if there is path found I just 
+	std::vector<Direction>* path = new std::vector<Direction>; 
+	path->push_back(cycle.nextDir(snake->headLocation()));
+	return path;
+
+	throw (1); //Handle the case where no safe path is found
 }
 
 void PathFinder::UpdateSnake(Snake* snake) {
@@ -80,20 +61,25 @@ bool PathFinder::safe(std::vector<Direction>* path) {
 	if (!path || path->empty()) return false;
 
 		// Get the snake after the move so we can test for saftey
-		Snake temp;
-		temp = *SimulateMove(path);
+		Snake* temp;
+		temp = SimulateMove(path);
+		
+		if (!temp) return false;
 
 		// Now check if we can travel on the cycle for a number of moves that
 		// grows exponentially based on the size of the snake
-		int turns = 12;// std::max(12.0, std::pow(2, snake->size / 10));
+		int turns = snake->size;// std::max(12.0, std::pow(2, snake->size / 10));
 	
-		for (int i = 12; i >= 0; --i) {
-			if (temp.died() || IsOposite(temp.direction, cycle.nextDir(temp.headLocation()))) 
+		for (int i = 0; i < turns; ++i) {
+			if (temp->died() || IsOposite(temp->direction, cycle.nextDir(temp->headLocation())))
 				return false;
-			temp.changeDirection(cycle.nextDir(temp.headLocation()));
-			temp.move();
+			temp->changeDirection(cycle.nextDir(temp->headLocation()));
+			temp->move();
 		}
 		
+		temp->deleteNodes();
+		delete temp;
+
 		return true;
 }
 
@@ -107,7 +93,20 @@ int PathFinder::distance(cords a, cords b) {
 }
 
 std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake) {
+	// First check if we are already on the cycle
+	std::vector<Direction>* cyclePath = new std::vector<Direction>;
+	cords cur = snake->headLocation();
+	for (int i = 0; i < snake->size; ++i) {
+		cyclePath->insert(cyclePath->begin(), cycle.nextDir(cur));
+		cycle.Shift(cycle.nextDir(cur), cur.second, cur.first);
+	}
+	if (cyclePath->size() >= 3 && safe(cyclePath)) return cyclePath;
+	else delete cyclePath;
+
+
+	// otherwise we find a path back to the cycle
 	std::vector<cords> nodes;
+	// load list of all ordered pairs into nodes
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
 			nodes.push_back(std::make_pair(j, i));
@@ -124,6 +123,7 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake) {
 		cords closestNode;
 		int closestNodeIndex = -1;
 
+		// Find closest node to snake
 		for (int i = 0; i < nodes.size(); ++i) {
 			cords cur = nodes[i];
 			int currentDistance = distance(cur, snake->headLocation());
@@ -145,7 +145,7 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake) {
 		if (path && safe(path)) {
 			/*for (int i = 0; i < snake->size; ++i) {
 				path->insert(path->begin(), cycle.nextDir(closestNode));
-				cycle.Shift(path->front(), closestNode.second, closestNode.first);
+				cycle.Shift(closestNode, closestNode.second, closestNode.first);
 			}*/
 			return path;  // Return the first safe path found
 		}
@@ -159,9 +159,6 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake) {
 	}
 	return NULL;
 }
-
-
-
 
 cords PathFinder::nextCycleNode(cords start) {
 	int max = height * width - 1;
@@ -189,6 +186,12 @@ Snake* PathFinder::SimulateMove(std::vector<Direction>* path) {
 		temp->move();
 		if (temp->headLocation() == goal) {
 			temp->grow(1);
+		}
+		if (snake->died()) {
+			temp->deleteNodes();
+			delete temp;
+			delete tempPath;
+			return NULL;
 		}
 	}
 	delete tempPath;
