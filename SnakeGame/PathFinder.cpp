@@ -25,7 +25,7 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 
 	Snake* simulatedSnake = SimulateMove(path);
 	if (simulatedSnake) {
-		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnake, 5);
+		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnake, width);
 		if (rejoinPath) {
 			simulatedSnake->deleteNodes();
 			delete simulatedSnake;
