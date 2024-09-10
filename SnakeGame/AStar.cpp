@@ -87,10 +87,10 @@ void AStar::updateSnake(Snake* snake) {
 	walls = snake->bodyLocation();
 
 	start = snake->headLocation();
-	startDir = snake->direction;
+	startDir = snake->getDirection();
 	height = snake->height;
 	width = snake->width;
-	size = snake->size;
+	size = snake->getSize();
 }
 
 std::vector<Direction>* AStar::FindPath(cords goal) {

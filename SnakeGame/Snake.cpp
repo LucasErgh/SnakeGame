@@ -4,6 +4,7 @@
 #include <time.h>
 
 Snake::Snake() {
+	alive = true;
 	height = 10;
 	width = 10;
 	head = new SnakeNode(std::make_pair(1, 1), nullptr, nullptr);
@@ -48,6 +49,29 @@ Snake::Snake(const Snake& snake) {
 
 Snake::~Snake() {
 	deleteNodes();
+}
+
+Snake& Snake::operator=(const Snake& snake) {
+	height = snake.height;
+	width = snake.width;
+	maxSize = snake.maxSize;
+	size = snake.size;
+	direction = snake.direction;
+	alive = snake.alive;
+	apple = snake.apple;
+
+	SnakeNode* cur = snake.head;
+	head = new SnakeNode(cur->cordinates, NULL, NULL);
+	SnakeNode* newCur = head;
+	while (cur->back != NULL) {
+		cur = cur->back;
+		newCur->back = new SnakeNode(cur->cordinates, newCur, NULL);
+		newCur->back->front = newCur;
+		newCur = newCur->back;
+	}
+	tail = newCur;
+
+	return *this;
 }
 
 cords Snake::appleCords() {
@@ -104,10 +128,18 @@ cords Snake::move() {
 		++maxSize;
 		if (size == height * width) {
 			alive = false;
+			return newHead->cordinates;
 		}
 		do {
 			apple.moveApple(width, height);
 		} while (isSnake(apple.getCords()));
+	}
+
+	// Check for collitsion
+	if (head->cordinates.first <= 0 || head->cordinates.second <= 0 || head->cordinates.first > width || head->cordinates.second > height) 
+		alive = false;
+	for (auto& cur : bodyLocation()) {
+		if (head->cordinates == cur) alive = false;
 	}
 
 	return newHead->cordinates;

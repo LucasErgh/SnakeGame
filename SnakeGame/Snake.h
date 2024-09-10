@@ -39,6 +39,9 @@ public:
 	~Snake();
 	// Destructor
 
+	Snake& operator=(const Snake& snake);
+	// Assignment operator for deep coppies
+
 	cords move();
 	// This function moves the snake one unit in current direction
 	// returns the location of the snake head
@@ -70,6 +73,9 @@ public:
 	int getSize();
 	// returns snakes size
 
+	int width;
+	int height;
+
 private:
 	void deleteNodes();
 	// Deletes all nodes
@@ -82,7 +88,5 @@ private:
 
 	int maxSize;
 	int size;
-	int width;
-	int height;
 	bool alive;
 };

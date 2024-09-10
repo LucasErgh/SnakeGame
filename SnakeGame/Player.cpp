@@ -18,7 +18,7 @@ bool Player::DoTurn() {
 	snake.move();
 
 	// Check if snake Died
-	if (!snake.alive) {
+	if (!snake.isAlive()) {
 		gameOver = true;
 		return false;
 	}
@@ -36,5 +36,5 @@ void Player::ChangeDirection(Direction dir) {
 }
 
 void Player::endGame() {
-	snake.deleteNodes();
+	// I don't think there is anything to be done
 }

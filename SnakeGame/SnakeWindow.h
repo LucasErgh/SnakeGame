@@ -28,6 +28,7 @@ class SnakeWindow : public BaseWindow<SnakeWindow>
     void    DiscardGraphicsResources();
     void    OnPaint();
     void    Resize();
+    void    PaintBoard(std::vector <cell> cells, int scale, int rows, int columns, int offset, float cellBoarder, int shiftRight);
 
     void EnterGame();
     void ExitGame();

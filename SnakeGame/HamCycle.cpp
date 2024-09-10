@@ -336,7 +336,7 @@ std::vector<Direction>* HamCycle::FindPath(Snake* snake, cords goal) {
 	cords cell = snake->headLocation();
 	--cell.first;
 	--cell.second;
-	Direction last = snake->direction;
+	Direction last = snake->getDirection();
 	Direction dir;
 
 	apple = cords(goal.first - 1, goal.second - 1);
@@ -346,8 +346,8 @@ std::vector<Direction>* HamCycle::FindPath(Snake* snake, cords goal) {
 	{
 		GetDirection(cycle, cell.second, cell.first, NULL, &dir, height, width, max);
 		if (IsOposite(dir, last)) {
-			directions->insert(directions->begin(), snake->direction);
-			Shift(snake->direction, cell.second, cell.first);
+			directions->insert(directions->begin(), snake->getDirection());
+			Shift(snake->getDirection(), cell.second, cell.first);
 			continue;
 		}
 		Shift(dir, cell.second, cell.first);

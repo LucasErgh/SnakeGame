@@ -39,6 +39,65 @@ void SnakeWindow::DiscardGraphicsResources() {
 	SafeRelease(&pBrush);
 }
 
+void SnakeWindow::PaintBoard(std::vector <cell> list, int scale, int rows, int columns, int offset, float cellBoarder, int shiftRight = 0){
+	
+	// Draw Grid
+	pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Black));
+	for (int i = 0; i <= rows; ++i) {
+		pRenderTarget->DrawLine(D2D1::Point2F(offset + shiftRight, i * scale + offset), D2D1::Point2F(columns * scale + offset + shiftRight, i * scale + offset), pBrush, 1);
+	}
+	for (int i = 0; i <= columns; ++i) {
+		pRenderTarget->DrawLine(D2D1::Point2F(i * scale + offset + shiftRight, offset), D2D1::Point2F(i * scale + offset + shiftRight, rows * scale + offset), pBrush, 1);
+	}
+
+	// Draw Snake Cells
+	cell* last = NULL;
+	for (cell& cur : list) {
+		int left = offset + cur.first.first * scale - scale * cellBoarder,
+			top = offset + cur.first.second * scale - scale * cellBoarder,
+			right = offset + cur.first.first * scale - scale * (1 - cellBoarder),
+			bottem = offset + cur.first.second * scale - scale * (1 - cellBoarder);
+		switch (cur.second) {
+		case 0:
+			pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Red));
+			ellipse = D2D1::Ellipse(D2D1::Point2F(offset + cur.first.first * scale - scale / 2 + shiftRight, offset + cur.first.second * scale - scale / 2), scale * .4, scale * .4);
+			pRenderTarget->FillEllipse(ellipse, pBrush);
+			break;
+		case 1:
+			last = &cur;
+			pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Green));
+			rectangle = D2D1::RectF(left + shiftRight, top, right + shiftRight, bottem);
+			pRenderTarget->FillRectangle(rectangle, pBrush);
+			break;
+		case 2:
+			pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::GreenYellow));
+			if (last != NULL && cur.first.first == last->first.first) { // This means they are in the same column
+				if (cur.first.second > last->first.second) { // this means the last was above the cur
+					top -= scale * ((1 - cellBoarder) * 2);
+				}
+				else {
+					bottem += scale * ((1 - cellBoarder) * 2);
+				}
+			}
+			else if (last != NULL) { // Otherwise they are in the same row
+				if (cur.first.first < last->first.first) { // this means last is right of cur
+					right += scale * ((1 - cellBoarder) * 2);
+				}
+				else {
+					left -= scale * ((1 - cellBoarder) * 2);
+				}
+
+			}
+			last = &cur;
+			rectangle = D2D1::RectF(left + shiftRight, top, right + shiftRight, bottem);
+			pRenderTarget->FillRectangle(rectangle, pBrush);
+			break;
+		}
+
+	}
+
+}
+
 void SnakeWindow::OnPaint() {
 	HRESULT hr = CreateGraphicsResources();
 	if (SUCCEEDED(hr)) {
@@ -49,72 +108,17 @@ void SnakeWindow::OnPaint() {
 
 		pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		if (info && (info->gamemode == IDC_RADIO1 || info->gamemode == IDC_RADIO2) && info->model1 && info->ingame) {
-			if (info->model1->isAlive()) {
-				static std::vector <cell> lastCellList = info->model1->GetCells();
-			}
-			// Draw Grid
-			int offset = 10;
-			int scale = info->scale;
-			int rows = info->rows;
-			int columns = info->columns;
-			float cellBoarder = .8;
-
-			pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Black));
-			for (int i = 0; i <= rows; ++i) {
-				pRenderTarget->DrawLine(D2D1::Point2F(offset, i * scale + offset), D2D1::Point2F(columns * scale + offset, i * scale + offset), pBrush, 1);
-			}
-			for (int i = 0; i <= columns; ++i) {
-				pRenderTarget->DrawLine(D2D1::Point2F(i * scale + offset, offset), D2D1::Point2F(i * scale + offset, rows * scale + offset), pBrush, 1);
-			}
-
-			// Draw Snake Cells
-
-			std::vector <cell> list = info->model1->GetCells();
-			cell* last = NULL;
-			for (cell &cur : list) {
-				int left = offset + cur.first.first * scale - scale * cellBoarder, 
-					top = offset + cur.first.second * scale - scale * cellBoarder,
-					right = offset + cur.first.first * scale - scale * (1 - cellBoarder),
-					bottem = offset + cur.first.second * scale - scale * (1 - cellBoarder);
-				switch (cur.second) {
-				case 0:
-					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Red));
-					ellipse = D2D1::Ellipse(D2D1::Point2F(offset + cur.first.first * scale - scale / 2, offset + cur.first.second * scale - scale / 2), scale * .4, scale * .4);
-					pRenderTarget->FillEllipse(ellipse, pBrush);
-					break;
-				case 1:
-					last = &cur;
-					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Green));
-					rectangle = D2D1::RectF(left, top, right, bottem);
-					pRenderTarget->FillRectangle(rectangle, pBrush);
-					break;
-				case 2:
-					pBrush->SetColor(D2D1::ColorF(D2D1::ColorF::GreenYellow));
-					if (last != NULL && cur.first.first == last->first.first) { // This means they are in the same column
-						if (cur.first.second > last->first.second) { // this means the last was above the cur
-							top -= scale * ((1 - cellBoarder) * 2);
-						}
-						else { 
-							bottem += scale * ((1 - cellBoarder) * 2);
-						}
-					}
-					else if (last != NULL){ // Otherwise they are in the same row
-						if (cur.first.first < last->first.first) { // this means last is right of cur
-							right += scale * ((1 - cellBoarder) * 2);
-						}
-						else {
-							left -= scale * ((1 - cellBoarder) * 2);
-						}
-
-					}
-					last = &cur;
-					rectangle = D2D1::RectF(left, top, right, bottem);
-					pRenderTarget->FillRectangle(rectangle, pBrush);
-					break;
-				}
-				
-			}
+		if (info && info->model1 && info->ingame) {
+			static std::vector<cell> cellList;
+			if(info->model1->isAlive())
+				cellList = info->model1->GetCells();
+			PaintBoard(cellList, 40, info->rows, info->columns, 10, .8);
+		}
+		if (info && info->gamemode == IDC_RADIO3 && info->model2 && info->ingame) {
+			static std::vector<cell> cellList;
+			if (info->model2->isAlive())
+				cellList = info->model2->GetCells();
+			PaintBoard(cellList, 40, info->rows, info->columns, 10, .8, (info->columns * 40 + .8 * info->columns + 20));
 		}
 
 		hr = pRenderTarget->EndDraw();
@@ -126,8 +130,8 @@ void SnakeWindow::OnPaint() {
 }
 
 int GetTime(int size) {
-	const int start = 30;
-	const int max = 30;
+	const int start = 250;
+	const int max = 80;
 	const double decayFactor = 0.95;
 	int speed;
 
@@ -177,11 +181,10 @@ void SnakeWindow::EnterGame() {
 		SetTimer(this->Window(), (int)IDC_RADIO1, 500, NULL);
 		break;
 	case IDC_RADIO3: // This is Player v Computer
-		throw(1); // Not implimented
 		info->model1 = new Player(info->columns, info->rows);
 		info->model2 = new ComputerPlayer(info->columns, info->rows);
 		SetTimer(this->Window(), (int)IDC_RADIO1, 500, NULL);
-		SetTimer(this->Window(), (int)IDC_RADIO2, 500, NULL);
+		SetTimer(this->Window(), (int)IDC_RADIO3, 500, NULL);
 		break;
 	default:
 		break;
@@ -192,20 +195,31 @@ void SnakeWindow::ExitGame() {
 	ControlInterface* model;
 	if (info->gamemode != IDC_RADIO3) {
 		model = info->model1;
+		std::wstring score = L"Game Over! Your score is: " + std::to_wstring(model->Score());
+		MessageBox(m_hwnd, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
 	}
-	else throw(1);
+	else {
+		std::wstring score;
+		if (info->model1->Score() > info->model2->Score()) {
+			model = info->model1;
+			score = L"Game Over! You won with score: " + std::to_wstring(model->Score());
+		}
+		else {
+			model = info->model2;
+			score = L"Game Over! AI won with score : " + std::to_wstring(model->Score());
+		}
+		MessageBox(m_hwnd, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
+	}
 
-	std::wstring score = L"Game Over! Your score is: " + std::to_wstring(model->Score());
-	MessageBox(m_hwnd, (LPCWSTR)score.c_str(), (LPCWSTR)L"Game Over", MB_OK);
 
 	info->ingame = false;
 	if (info->model1) {
-		info->model1->endGame();
 		delete info->model1;
+		info->model1 = NULL;
 	}
 	if (info->model2) {
-		info->model2->endGame();
 		delete info->model2;
+		info->model2 = NULL;
 	}
 	
 	ShowButtons();
@@ -291,16 +305,18 @@ void SnakeWindow::TimerUp(int num) {
 	ControlInterface* model;
 
 	if (num == IDC_RADIO1) model = info->model1;
-	else if (num == IDC_RADIO1) model = info->model2;
+	else if (num == IDC_RADIO3) model = info->model2;
 	else throw(1);
 
-	if (model->isAlive()) {
+	if (model && model->isAlive()) {
 		SetTimer(m_hwnd, num, GetTime(model->Score()), NULL);
 		model->DoTurn();
 	}
-	else {
+	else if (info->ingame){
 		KillTimer(m_hwnd, num);
 		ExitGame();
+		if (info->gamemode == IDC_RADIO3 && num == IDC_RADIO1) 
+			KillTimer(m_hwnd, IDC_RADIO3);
 	}
 	OnPaint();
 }

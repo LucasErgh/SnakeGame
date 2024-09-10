@@ -16,7 +16,7 @@ bool ComputerPlayer::DoTurn() {
 		directions = NULL;
 	}
 	if (directions == NULL) {
-		directions = path->FindPath(&snake, snake.apple.getCords());
+		directions = path->FindPath(&snake, snake.appleCords());
 	}
 	if (directions != NULL && directions->size() != 0) {
 		Direction direction = directions->back();
@@ -26,8 +26,9 @@ bool ComputerPlayer::DoTurn() {
 
 	snake.move();
 
-	if (!snake.alive) {
+	if (!snake.isAlive()) {
 		path->Delete();
+		delete path;
 		gameOver = true;
 		return false;
 	}
@@ -39,5 +40,4 @@ void ComputerPlayer::ChangeDirection(Direction) {
 }
 
 void ComputerPlayer::endGame() {
-		snake.deleteNodes();
 }
