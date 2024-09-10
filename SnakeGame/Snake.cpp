@@ -46,6 +46,14 @@ Snake::Snake(const Snake& snake) {
 	tail = newCur;
 }
 
+Snake::~Snake() {
+	deleteNodes();
+}
+
+cords Snake::appleCords() {
+	return apple.getCords();
+}
+
 cords Snake::move() {
 	if (direction == none) return head->cordinates;
 
@@ -154,21 +162,11 @@ void Snake::deleteNodes() {
 	delete cur;
 }
 
-Direction Snake::GetDirection() { return this->direction; }
+Direction Snake::getDirection() { return this->direction; }
 
-bool Snake::died() {
-	cords headCords = headLocation();
-	if (headCords.first <= 0 || headCords.second <= 0 || headCords.first > width || headCords.second > height)
-		return true;
+bool Snake::isAlive() { return alive; }
 
-	std::vector<cords> body = bodyLocation();
-	for (auto cur : body) {
-		if (head->cordinates == cur)
-			return true;
-	}
-
-	return false;
-}
+int Snake::getSize() { return size; }
 
 SnakeNode::SnakeNode(cords cordinates, SnakeNode* front, SnakeNode* back) {
 	this->cordinates = cordinates;

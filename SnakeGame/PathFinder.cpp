@@ -2,7 +2,6 @@
 #include <cmath>
 
 void PathFinder::Delete() {
-	snake->deleteNodes();
 	delete snake;
 }
 
@@ -27,7 +26,6 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	if (simulatedSnake) {
 		std::vector<Direction>* rejoinPath = RejoinCycle(simulatedSnake, width);
 		if (rejoinPath) {
-			simulatedSnake->deleteNodes();
 			delete simulatedSnake;
 			simulatedSnake = NULL;
 			// now append the old path to the new path
@@ -44,7 +42,6 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	
 	// Free unused memory
 	if (simulatedSnake) {
-		simulatedSnake->deleteNodes();
 		delete simulatedSnake;
 		simulatedSnake = NULL;
 	}
@@ -59,7 +56,6 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 
 void PathFinder::UpdateSnake(Snake* snake) {
 	if (this->snake) {
-		this->snake->deleteNodes();
 		delete this->snake;
 	}
 
@@ -81,18 +77,17 @@ bool PathFinder::safe(std::vector<Direction>* path) {
 
 		// Now check if we can travel on the cycle for a number of moves that
 		// grows exponentially based on the size of the snake
-		int turns = temp->size * 1.5;// std::max(12.0, std::pow(2, snake->size / 10));
+		int turns = temp->getSize() * 1.5;// std::max(12.0, std::pow(2, snake->size / 10));
 	
 		for (int i = 0; i < turns; ++i) {
-			if (temp->died() || IsOposite(temp->direction, cycle.nextDir(temp->headLocation())))
+			if (!temp->isAlive() || IsOposite(temp->getDirection(), cycle.nextDir(temp->headLocation())))
 				return false;
 			temp->changeDirection(cycle.nextDir(temp->headLocation()));
 			temp->move();
-			if (temp->died() || IsOposite(temp->direction, cycle.nextDir(temp->headLocation())))
+			if (!temp->isAlive() || IsOposite(temp->getDirection(), cycle.nextDir(temp->headLocation())))
 				return false;
 		}
 		
-		temp->deleteNodes();
 		delete temp;
 
 		return true;
@@ -195,8 +190,7 @@ Snake* PathFinder::SimulateMove(std::vector<Direction>* path) {
 		tempPath->pop_back();
 		temp->changeDirection(dir);
 		temp->move();
-		if (!temp->alive) {
-			temp->deleteNodes();
+		if (!temp->isAlive()) {
 			delete temp;
 			delete tempPath;
 			return NULL;

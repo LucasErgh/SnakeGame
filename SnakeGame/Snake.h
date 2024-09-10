@@ -36,7 +36,8 @@ public:
 	Snake(const Snake& snake);
 	// Copy Constructor
 
-	//Snake* MakeCopy();
+	~Snake();
+	// Destructor
 
 	cords move();
 	// This function moves the snake one unit in current direction
@@ -57,22 +58,31 @@ public:
 	std::vector<cords> bodyLocation();
 	// Returns list of body cords
 
+	bool isAlive();
+	// returns whether or not the snake is alive
+
+	cords appleCords();
+	// returns apple's cords
+
+	Direction getDirection();
+	// returns snakes current direction
+
+	int getSize();
+	// returns snakes size
+
+private:
 	void deleteNodes();
 	// Deletes all nodes
+	
+	SnakeNode *head;
+	SnakeNode *tail;
 
-	bool died();
-
-	Direction GetDirection();
-
-	bool alive;
-	int width;
-	int height;
-	int maxSize;
-	int size;
 	Direction direction;
 	Apple apple;
 
-private:
-	SnakeNode *head;
-	SnakeNode *tail;
+	int maxSize;
+	int size;
+	int width;
+	int height;
+	bool alive;
 };

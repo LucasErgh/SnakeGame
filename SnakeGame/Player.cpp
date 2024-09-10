@@ -26,7 +26,7 @@ bool Player::DoTurn() {
 }
 
 void Player::ChangeDirection(Direction dir) {
-	if (queuedDirection1 == none && !IsOposite(dir, snake.GetDirection())) {
+	if (queuedDirection1 == none && !IsOposite(dir, snake.getDirection())) {
 		queuedDirection1 = dir;
 		return;
 	}
