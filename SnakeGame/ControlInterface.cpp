@@ -13,7 +13,7 @@ CellList ControlInterface::GetCells() {
 	CellList list;
 	list.clear();
 
-	list.push_back(std::make_pair(apple.getCords(), appleCell));
+	list.push_back(std::make_pair(snake.apple.getCords(), appleCell));
 	list.push_back(std::make_pair(snake.headLocation(), headCell));
 	for (auto cur : snake.bodyLocation()) {
 		list.push_back(std::make_pair(cur, bodyCell));

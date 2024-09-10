@@ -1,8 +1,21 @@
-#include <utility> // std::pair
+#pragma once
 
+#include <utility> // std::pair
 #include "DataTypes.h"
 
-#pragma once
+
+class Apple {
+public:
+	Apple();
+
+	cords getCords();
+
+	cords moveApple(int width, int height);
+
+private:
+	cords cordinates;
+};
+
 class SnakeNode {
 public:
 	SnakeNode(cords cordinates, SnakeNode* front, SnakeNode* back);
@@ -51,26 +64,15 @@ public:
 
 	Direction GetDirection();
 
-
+	bool alive;
 	int width;
 	int height;
 	int maxSize;
 	int size;
 	Direction direction;
+	Apple apple;
 
 private:
 	SnakeNode *head;
 	SnakeNode *tail;
-};
-
-class Apple {
-public:
-	Apple();
-
-	cords getCords();
-
-	cords moveApple(int width, int height);
-
-private:
-	cords cordinates;
 };

@@ -24,7 +24,6 @@ protected:
 	const int growthRate = 1;
 	int width, height;
 	Snake snake;
-	Apple apple;
 	bool gameOver;
 };
 

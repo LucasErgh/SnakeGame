@@ -6,11 +6,6 @@ Player::Player(int width, int height){
 	this->width = width;
 	this->height = height;
 	this->gameOver = false;
-
-	apple = Apple();
-	do {
-		apple.moveApple(this->width, this->height);
-	} while (snake.isSnake(apple.getCords()));
 }
 
 bool Player::DoTurn() {
@@ -22,16 +17,8 @@ bool Player::DoTurn() {
 	}
 	snake.move();
 
-	// Check for apple collision, grow and make new apple if so
-	if (snake.headLocation() == apple.getCords()) {
-		snake.grow(growthRate);
-		do {
-			apple.moveApple(width, height);
-		} while (snake.isSnake(apple.getCords()));
-	}
-
-	//Check for wall collision and snake collision
-	if (snake.died()) {
+	// Check if snake Died
+	if (!snake.alive) {
 		gameOver = true;
 		return false;
 	}

@@ -11,14 +11,18 @@ Snake::Snake() {
 	direction = none;
 	size = 1;
 	maxSize = size;
+	do {
+		apple.moveApple(width, height);
+	} while (isSnake(apple.getCords()));
 }
 
-Snake::Snake(cords start, int width, int height) : width(width), height(height) {
+Snake::Snake(cords start, int width, int height) : width(width), height(height), alive(true) {
 	head = new SnakeNode(start, nullptr, nullptr);
 	tail = head;
 	direction = none;
 	size = 1;
 	maxSize = size;
+	apple.moveApple(width, height);
 }
 
 Snake::Snake(const Snake& snake) {
@@ -27,6 +31,8 @@ Snake::Snake(const Snake& snake) {
 	maxSize = snake.maxSize;
 	size = snake.size;
 	direction = snake.direction;
+	alive = snake.alive;
+	apple = snake.apple;
 
 	SnakeNode* cur = snake.head;
 	head = new SnakeNode(cur->cordinates, NULL, NULL);
@@ -84,6 +90,18 @@ cords Snake::move() {
 		}
 		delete oldTail;
 	}
+
+	// Check if we ate the apple
+	if (newHead->cordinates == apple.getCords()) {
+		++maxSize;
+		if (size == height * width) {
+			alive = false;
+		}
+		do {
+			apple.moveApple(width, height);
+		} while (isSnake(apple.getCords()));
+	}
+
 	return newHead->cordinates;
 }
 

@@ -88,7 +88,6 @@ bool PathFinder::safe(std::vector<Direction>* path) {
 				return false;
 			temp->changeDirection(cycle.nextDir(temp->headLocation()));
 			temp->move();
-			if (temp->headLocation() == goal) temp->grow(1);
 			if (temp->died() || IsOposite(temp->direction, cycle.nextDir(temp->headLocation())))
 				return false;
 		}
@@ -196,10 +195,7 @@ Snake* PathFinder::SimulateMove(std::vector<Direction>* path) {
 		tempPath->pop_back();
 		temp->changeDirection(dir);
 		temp->move();
-		if (temp->headLocation() == goal) {
-			temp->grow(1);
-		}
-		if (snake->died()) {
+		if (!temp->alive) {
 			temp->deleteNodes();
 			delete temp;
 			delete tempPath;
