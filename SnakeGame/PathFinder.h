@@ -1,10 +1,23 @@
 #pragma once
 
-#include "HamCycle.h"
-#include "AStar.h"
 #include "Snake.h"
 #include "DataTypes.h"
 
+class Node {
+public:
+	Direction dir;
+	Node* parent;
+	cords pos;
+	int G; // Cost from initial state
+	int H; // Estimated cost of cheapest path
+
+	Node(cords cords, Node* parent, Direction direction);
+
+	// Sum of G and H
+	int GetScore();
+};
+
+typedef std::vector<Node*> NodeSet;
 typedef std::vector<cords> CordList;
 
 class PathFinder
@@ -19,11 +32,15 @@ public:
 	void Delete();
 
 private:
-	AStar star;
 	int width, height, max;
 	Snake* snake;
 	cords goal;
 	int** cycle;
+
+	int size;
+	CordList walls;
+	cords start;
+	Direction startDir;
 
 	// This will make a copy of the snake for my pathfinders to use
 	void UpdateSnake(Snake* snake);
@@ -53,9 +70,6 @@ private:
 	// and width and height are the same value
 	int** GenerateCycle();
 
-	// This will get the path
-	std::vector<Direction>* CycleToGoal(Snake* snake, cords goal);
-
 	// This shifts cells in the given direction
 	void Shift(Direction dir, int& y, int& x);
 
@@ -71,6 +85,21 @@ private:
 
 	// returns the direction you have to go for the previous node
 	Direction prevDir(cords cords);
+
+	std::vector<Direction>* FindAStarPath(cords goal);
+
+	// Cechs list of walls for collisions
+	bool collision(cords check, int movement);
+
+	// moves given cell in given direction one unit
+	void Shift(Direction dir, cords& cur);
+
+	// Returns node with given cords from set of all nodes
+	Node* findNode(NodeSet& nodes, cords cur);
+
+	std::vector<Direction>* getDirections(CordList cordList);
+	
+	void UpdateAStar(Snake* snake);
 
 };
 

@@ -127,7 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AStar.cpp" />
     <ClCompile Include="ComputerPlayer.cpp" />
     <ClCompile Include="ControlInterface.cpp" />
     <ClCompile Include="PathFinder.cpp" />
@@ -137,7 +136,6 @@
     <ClCompile Include="SnakeWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AStar.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="ComputerPlayer.h" />
     <ClInclude Include="ControlInterface.h" />

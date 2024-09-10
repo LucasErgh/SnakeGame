@@ -5,7 +5,7 @@ void PathFinder::Delete() {
 	delete snake;
 }
 
-PathFinder::PathFinder(int width, int height) : star(AStar(snake)), snake(NULL), width(width), height(height), max(width * height - 1), cycle(GenerateCycle()) {}
+PathFinder::PathFinder(int width, int height) : snake(NULL), width(width), height(height), max(width * height - 1), cycle(GenerateCycle()) {}
 
 std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	// Update Board
@@ -13,7 +13,7 @@ std::vector<Direction>* PathFinder::FindPath(Snake* newSnake, cords goal) {
 	UpdateSnake(newSnake);
 
 	// Try to find the A* path
-	std::vector<Direction>* path = star.FindPath(goal);
+	std::vector<Direction>* path = FindAStarPath(goal);
 
 	// Check if its safe
 	if (safe(path))
@@ -63,7 +63,7 @@ void PathFinder::UpdateSnake(Snake* snake) {
 	this->snake = new Snake(*snake);
 
 	// Updates AStar's version of the snake
-	star.updateSnake(this->snake);
+	UpdateAStar(this->snake);
 }
 
 bool PathFinder::safe(std::vector<Direction>* path) {	
@@ -146,8 +146,8 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake, int radius) {
 		}
 
 		// Try to find a path to the closest node
-		star.updateSnake(snake);
-		path = star.FindPath(closestNode);
+		UpdateAStar(snake);
+		path = FindAStarPath(closestNode);
 		if (path && safe(path)) {
 			return path;  // Return the first safe path found
 		}
@@ -161,18 +161,6 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake, int radius) {
 	}
 	return NULL;
 }
-
-//cords PathFinder::nextCycleNode(cords start) {
-//	int max = height * width - 1;
-//	int next = cycle[start.second][start.first];
-//	
-//	next = (next == max) ? 0 : next + 1;
-//
-//	if (cycle[start.second + 1][start.first] == next) return std::make_pair(start.second + 1, start.first);
-//	else if (cycle[start.second][start.first + 1] == next) return std::make_pair(start.second, start.first + 1);
-//	else if (cycle[start.second - 1][start.first] == next) return std::make_pair(start.second - 1, start.first);
-//	else if (cycle[start.second][start.first - 1] == next) return std::make_pair(start.second, start.first - 1);
-//}
 
 Snake* PathFinder::SimulateMove(std::vector<Direction>* path) {
 	// Make copy of snake and path as not to damage either
@@ -554,4 +542,147 @@ int** PathFinder::GenerateCycle() {
 	delete[] minDilated;
 	delete[] SquareCycles;
 	return ReducedGrid;
+}
+
+Node* PathFinder::findNode(NodeSet& nodes, cords cur) {
+	for (auto node : nodes) {
+		if (node->pos == cur) {
+			return node;
+		}
+	}
+	return NULL;
+}
+
+std::vector<Direction>* PathFinder::getDirections(CordList cordList) {
+	std::vector<Direction>* directions = new std::vector<Direction>;
+
+	for (int i = 0; i < cordList.size() - 1; ++i) {
+		cords cur = cordList[i];
+		cords next = cordList[i + 1];
+
+		if (cur.second > next.second) directions->push_back(down);
+		else if (cur.second < next.second) directions->push_back(up);
+		else if (cur.first < next.first) directions->push_back(left);
+		else if (cur.first > next.first) directions->push_back(right);
+	}
+	return directions;
+}
+
+void PathFinder::UpdateAStar(Snake* snake) {
+	walls.reserve(1);
+	walls = snake->bodyLocation();
+
+	start = snake->headLocation();
+	startDir = snake->getDirection();
+	height = snake->height;
+	width = snake->width;
+	size = snake->getSize();
+}
+
+std::vector<Direction>* PathFinder::FindAStarPath(cords goal) {
+	Node* current = NULL;
+	NodeSet openSet; // This is for nodes who have not been checked
+	NodeSet	closedSet; // This is for nodes who have been checked
+
+	openSet.push_back(new Node(start, NULL, startDir));
+
+	while (!openSet.empty()) {
+		auto root = openSet.begin();
+		current = *root;
+
+		// Find best node as of now
+		for (auto cur = openSet.begin(); cur != openSet.end(); ++cur) {
+			auto node = *cur;
+			if (node->GetScore() <= current->GetScore()) {
+				current = node;
+				root = cur;
+			}
+		}
+
+		// Check if path was found
+		if (current->pos == goal) {
+			break;
+		}
+
+		//  
+		closedSet.push_back(current);
+		openSet.erase(root);
+
+		// Grow graph from new best cell
+		for (int i = 0; i < 4; ++i) {
+			// make new cell in correct direction
+			if (IsOposite((Direction)i, current->dir)) continue;
+
+			cords newCords = current->pos;
+			Shift((Direction)i, newCords);
+			if (collision(newCords, current->G + 1) || findNode(closedSet, newCords)) {
+				continue;
+			}
+
+			int totalCost = current->G + 1;
+
+			Node* successor = findNode(openSet, newCords);
+			if (!successor) {
+				successor = new Node(newCords, current, (Direction)i);
+				successor->G = totalCost;
+				successor->H = distance(successor->pos, goal);
+				openSet.push_back(successor);
+			}
+			else if (totalCost < successor->G) {
+				successor->parent = current;
+				successor->G = totalCost;
+			}
+		}
+	}
+
+	CordList path;
+	while (current != NULL) {
+		path.push_back(current->pos);
+		current = current->parent;
+	}
+
+	for (auto cur : openSet) {
+		delete cur;
+	}
+	for (auto cur : closedSet) {
+		delete cur;
+	}
+
+	return getDirections(path);
+}
+
+bool PathFinder::collision(cords check, int movement) {
+	if (check.first < 1 || check.first > width || check.second < 1 || check.second > height)
+		return true;
+	for (int i = 0; i < walls.size(); ++i) {
+		if (walls[i] == check && (size - i) > movement) {
+			return true;
+		}
+	}
+
+
+	return false;
+}
+
+void PathFinder::Shift(Direction dir, cords& cur) {
+	switch (dir)
+	{
+	case up: --cur.second; return;
+	case down: ++cur.second; return;
+	case left: --cur.first; return;
+	case right: ++cur.first; return;
+	default: throw(1);
+	}
+}
+
+Node::Node(cords cords, Node* parent, Direction direction) {
+	pos = cords;
+	this->parent = parent;
+	G = H = 0;
+	dir = direction;
+}
+
+int Node::GetScore()
+{
+	return G + H;
 }
