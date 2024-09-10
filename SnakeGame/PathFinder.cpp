@@ -75,9 +75,8 @@ bool PathFinder::safe(std::vector<Direction>* path) {
 		
 		if (!temp) return false;
 
-		// Now check if we can travel on the cycle for a number of moves that
-		// grows exponentially based on the size of the snake
-		int turns = temp->getSize() * 1.5;// std::max(12.0, std::pow(2, snake->size / 10));
+		// Now check if we can travel on the cycle
+		int turns = temp->getSize() * 1.1;
 	
 		for (int i = 0; i < turns; ++i) {
 			if (!temp->isAlive() || IsOposite(temp->getDirection(), nextDir(temp->headLocation())))
@@ -110,7 +109,7 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake, int radius) {
 	xmin = (snake->headLocation().first - radius >= 1) ? snake->headLocation().first - radius : 1;
 	ymin = (snake->headLocation().second - radius >= 1) ? snake->headLocation().second - radius : 1;
 	xmax = (snake->headLocation().first + radius <= width) ? snake->headLocation().first + radius : width;
-	ymax = (snake->headLocation().second + radius <= height) ? snake->headLocation().first + radius : height;
+	ymax = (snake->headLocation().second + radius <= height) ? snake->headLocation().second + radius : height;
 
 	// load list of all ordered pairs into nodes
 	for (int i = ymin; i <= ymax; ++i) {
@@ -120,7 +119,7 @@ std::vector<Direction>* PathFinder::RejoinCycle(Snake* snake, int radius) {
 	}
 
 	bool safepath = false;
-	int minDistance = height * width, tempd;
+	int minDistance = 10000, tempd;
 
 	std::vector<Direction>* path = NULL;
 
