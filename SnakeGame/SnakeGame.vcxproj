@@ -130,7 +130,6 @@
     <ClCompile Include="AStar.cpp" />
     <ClCompile Include="ComputerPlayer.cpp" />
     <ClCompile Include="ControlInterface.cpp" />
-    <ClCompile Include="HamCycle.cpp" />
     <ClCompile Include="PathFinder.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snake.cpp" />
@@ -143,7 +142,6 @@
     <ClInclude Include="ComputerPlayer.h" />
     <ClInclude Include="ControlInterface.h" />
     <ClInclude Include="DataTypes.h" />
-    <ClInclude Include="HamCycle.h" />
     <ClInclude Include="PathFinder.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Snake.h" />
