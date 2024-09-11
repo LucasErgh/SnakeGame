@@ -40,4 +40,5 @@ void ComputerPlayer::ChangeDirection(Direction) {
 }
 
 void ComputerPlayer::endGame() {
+
 }

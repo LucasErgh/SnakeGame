@@ -3,6 +3,10 @@
 
 void PathFinder::Delete() {
 	delete snake;
+	for (int i = 0; i < height; ++i) {
+		delete[] cycle[i];
+	}
+	delete[] cycle;
 }
 
 PathFinder::PathFinder(int width, int height) : snake(NULL), width(width), height(height), max(width * height - 1), cycle(GenerateCycle()) {}
@@ -73,18 +77,24 @@ bool PathFinder::safe(std::vector<Direction>* path) {
 		Snake* temp;
 		temp = SimulateMove(path);
 		
-		if (!temp) return false;
-
+		if (!temp) {
+			delete temp;
+			return false;
+		}
 		// Now check if we can travel on the cycle
 		int turns = temp->getSize() * 1.1;
 	
 		for (int i = 0; i < turns; ++i) {
-			if (!temp->isAlive() || IsOposite(temp->getDirection(), nextDir(temp->headLocation())))
+			if (!temp->isAlive() || IsOposite(temp->getDirection(), nextDir(temp->headLocation()))) {
+				delete temp;
 				return false;
+			}
 			temp->changeDirection(nextDir(temp->headLocation()));
 			temp->move();
-			if (!temp->isAlive() || IsOposite(temp->getDirection(), nextDir(temp->headLocation())))
+			if (!temp->isAlive() || IsOposite(temp->getDirection(), nextDir(temp->headLocation()))) {
+				delete temp;
 				return false;
+			}
 		}
 		
 		delete temp;
