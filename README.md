@@ -1,11 +1,11 @@
 # SnakeGame
-This is my implimentation of the game "Snake"
+This is my implementation of the game "Snake"
 
-Background:
-I've done similar projects in the past with C# and the .net framework but I wanted to use c++ for this project as thats what language I'm using in school. So I had to learn about win32, COM and Direct2D. Which turned out to be more difficult than I was expecting given that I was spoiled with .NET and the Visual Studio Designer. 
+## Background:
+I've done similar projects in the past with C# and the .NET framework but I wanted to use C++ for this project as I'm starting to learn C++ for school. Further, it was also something that would allow me to learn about Win32, COM and Direct2D.
 
-Project Desctiption:
-Create a version of the game "Snake" that runs with win32 as well as make a pathfinding algorithm that the player can compete with. To do so I plan to make a launcher window that allows the player to select which gamemode they want to play as well as other options like board size. This launches the game window which controls the game logic.
+## Project Description:
+Develop a Win32 based version of the game "Snake" with a pathfinding algorithm for the player to compete with. The project includes three game modes, single player, computer player, and player vs computer. The pathfinding uses an altered version of the A* pathfinding algorithm and an algorithm to create a Hamilton cycle with maximum turns on a square grid to safely get apples.
 
-Approach:
-I plan to have snake window class which uses a control interface to run both the player controlled snake and the ai controlled snake. This means I will have virtual control interface with two seperate child classes that inherit from it. One for Computer Controlled snake and one for the Player. I also plan to have multiple objects for the Computer Player that use different pathfinding algorithms, I will allow the player to choose which version they want to compete against.
+## PROBLEMS:
+Since I started this project I've learned a lot, my code has multiple areas for improvement. This includes things like consistent naming, code duplication, and unused C++ features. I could have been using smart pointers, nullptr instead of NULL, list or deque instead of writing my own linked list to represent the snake (I chose to do that for fun), const where in functions were applicable, and using destructors instead of resources freeing functions. Moreover, there are improvements to the pathfinding function I could make. For example, checking if the path is safe in the A* logic rather than running A* then checking if it was safe.
